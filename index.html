@@ -591,8 +591,63 @@
           </div></div>
         </div>
 
-        <!-- STEP 17: FINANCIALS -->
+        <!-- STEP 17: ADDITIONAL INFO -->
         <div class="stepPanel hidden" data-step="17">
+          <div class="form">
+            <div>
+              <label for="numEntities">How many business entities do you own?</label>
+              <input id="numEntities" type="number" min="1" step="1" placeholder="e.g., 1" />
+            </div>
+            <div id="commonOwnershipWrap" style="display:none;">
+              <label for="commonOwnership">Do any share common ownership?</label>
+              <select id="commonOwnership">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label for="annualHomeExpenses">Annual home expenses — mortgage interest + utilities combined</label>
+              <input id="annualHomeExpenses" type="number" min="0" step="100" placeholder="e.g., 24000" />
+            </div>
+            <div>
+              <label for="bizPhoneInternetPct">What percentage of your phone and internet is used for business?</label>
+              <input id="bizPhoneInternetPct" type="number" min="0" max="100" step="5" placeholder="e.g., 80" />
+              <div class="hint">Enter a number between 0 and 100.</div>
+            </div>
+            <div>
+              <label for="purchasedEquipment">Did you purchase equipment, vehicles, or make building improvements this year?</label>
+              <select id="purchasedEquipment">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div id="equipmentCostWrap" style="display:none;">
+              <label for="equipmentCost">Approximate cost of qualifying purchases</label>
+              <input id="equipmentCost" type="number" min="0" step="1000" placeholder="e.g., 50000" />
+            </div>
+            <div id="equipmentPlacedInServiceWrap" style="display:none;">
+              <label for="equipmentPlacedInService">Were they placed in service this year?</label>
+              <select id="equipmentPlacedInService">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label for="hasUnrealizedLosses">Do you have taxable investment accounts with unrealized losses?</label>
+              <select id="hasUnrealizedLosses">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div id="unrealizedLossAmountWrap" style="display:none;">
+              <label for="unrealizedLossAmount">Approximate amount of unrealized losses</label>
+              <input id="unrealizedLossAmount" type="number" min="0" step="1000" placeholder="e.g., 15000" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 18: FINANCIALS -->
+        <div class="stepPanel hidden" data-step="18">
           <div class="form">
             <div>
               <label for="revenue">Annual revenue</label>
@@ -613,8 +668,8 @@
           </div>
         </div>
 
-        <!-- STEP 18: DEDUCTIONS / DETAILS -->
-        <div class="stepPanel hidden" data-step="18">
+        <!-- STEP 19: DEDUCTIONS / DETAILS -->
+        <div class="stepPanel hidden" data-step="19">
           <div class="form">
             <div>
               <label for="retirementContrib">Retirement contributions</label>
@@ -750,8 +805,8 @@
           </div>
         </div>
 
-        <!-- STEP 19: RESULTS -->
-        <div class="stepPanel hidden" data-step="19">
+        <!-- STEP 20: RESULTS -->
+        <div class="stepPanel hidden" data-step="20">
           <div class="thankYouCard">
             <div class="thankYouIcon">&#10003;</div>
             <h2>Thank You!</h2>
@@ -857,18 +912,56 @@
 
     const STRATEGY_RULES = [
       {
+        id: "scorp_salary",
+        name: "S-Corp Employment Tax Savings",
+        description: "Optimize S-Corp owner salary to reduce self-employment taxes.",
+        compute: (ctx) => {
+          if (ctx.taxTreatment !== "s_corp") return { eligible: false, savingsRange: range(0,0), details: "Requires S-Corp tax treatment.", tags: ["S-Corp", "Payroll"] };
+          const savings = (ctx.netIncome - ctx.ownerW2) * 0.153 * 0.5;
+          const savingsRange = range(savings * 0.9, savings * 1.1);
+          const w2Pct = ctx.netIncome > 0 ? ctx.ownerW2 / ctx.netIncome : 0;
+          const warning = w2Pct < 0.40 ? "\n\u26a0\ufe0f Your W-2 may be below reasonable compensation threshold \u2014 consult your CPA." : "";
+          return {
+            eligible: ctx.netIncome > 0 && ctx.ownerW2 > 0,
+            savingsRange,
+            details: `(Net profit ${money(ctx.netIncome)} \u2212 Owner W-2 ${money(ctx.ownerW2)}) \u00d7 15.3% \u00d7 50% at ${pct(ctx.assumedMarginalRate)}.${warning}`,
+            tags: ["S-Corp", "Payroll"],
+          };
+        },
+      },
+      {
+        id: "holding_company",
+        name: "Holding Company Opportunity",
+        description: "Multiple commonly-owned entities may benefit from consolidation.",
+        compute: (ctx) => {
+          if (!(ctx.numEntities > 2 && ctx.commonOwnership === "yes")) return { eligible: false, savingsRange: range(0,0), details: "Requires more than 2 commonly-owned entities.", tags: ["Entity Structure", "Consultation"] };
+          return {
+            eligible: true,
+            consultationOnly: true,
+            savingsRange: range(0, 0),
+            details: "Multiple commonly-owned entities may benefit from consolidation. This is worth a conversation with your CPA.",
+            tags: ["Entity Structure", "Consultation"],
+          };
+        },
+      },
+      {
         id: "accountable_plan",
         name: "Accountable Plan",
         description: "Reimburse personal expenses (home office, phone/internet, mileage) through your business (IRC \u00a762(a)(2)(A)).",
         compute: (ctx) => {
           const miles = Math.max(0, ctx.annualMiles || 0);
-          const mileageDed = miles * STRATEGY_ASSUMPTIONS.mileageRate;
+          const mileageDed = miles * 0.70;
 
           const phoneMonthly = Math.max(0, ctx.phoneInternetMonthly || 0);
-          const phoneDed = (phoneMonthly * 12) * STRATEGY_ASSUMPTIONS.phoneInternetBizUsePct;
+          const bizPct = clamp01((ctx.bizPhoneInternetPct || 80) / 100);
+          const phoneDed = (phoneMonthly * 12) * bizPct;
 
           const officeSqft = Math.max(0, ctx.homeOfficeSqft || 0);
-          const officeDed = officeSqft * STRATEGY_ASSUMPTIONS.homeOfficeAnnualPerSqFt;
+          const homeSqft = Math.max(0, ctx.homeSqft || 0);
+          const annualHomeExp = Math.max(0, ctx.annualHomeExpenses || 0);
+          const officeDed = (officeSqft > 0 && homeSqft > 0 && annualHomeExp > 0)
+            ? (officeSqft / homeSqft) * annualHomeExp
+            : officeSqft * STRATEGY_ASSUMPTIONS.homeOfficeAnnualPerSqFt;
 
           const hasBehaviorInputs = (miles > 0 || phoneMonthly > 0 || officeSqft > 0);
           const fallbackLow = ctx.revenue * STRATEGY_ASSUMPTIONS.accountablePlanPctOfRevenueLow;
@@ -1030,6 +1123,72 @@
           };
         },
       },
+      {
+        id: "section_179",
+        name: "Section 179 / Bonus Depreciation",
+        description: "Immediate expensing of qualifying business property purchases.",
+        compute: (ctx) => {
+          if (ctx.purchasedEquipment !== "yes" || ctx.equipmentPlacedInService !== "yes") return { eligible: false, savingsRange: range(0,0), details: "Requires qualifying equipment purchased and placed in service this year.", tags: ["Depreciation", "Capital"] };
+          const qualifying = Math.min(ctx.equipmentCost, 1250000);
+          const savingsRange = rangeFromDeduction(qualifying * 0.9, qualifying * 1.1, ctx.assumedMarginalRate);
+          return {
+            eligible: qualifying > 0,
+            savingsRange,
+            details: `Qualifying purchases: ${money(qualifying)} \u00d7 ${pct(ctx.assumedMarginalRate)}. Note: 100% bonus depreciation available for property placed in service after Jan 19, 2025.`,
+            tags: ["Depreciation", "Capital"],
+          };
+        },
+      },
+      {
+        id: "re_grouping",
+        name: "Real Estate Grouping Election",
+        description: "Grouping election may allow passive losses to offset active income.",
+        compute: (ctx) => {
+          if (ctx.ownsRental !== "yes") return { eligible: false, savingsRange: range(0,0), details: "Requires rental real estate ownership.", tags: ["Real Estate", "Consultation"] };
+          if (ctx.reProfessional !== "yes" && ctx.materialParticipation !== "yes") return { eligible: false, savingsRange: range(0,0), details: "Requires REPS or material participation status.", tags: ["Real Estate", "Consultation"] };
+          let note = "Your situation may allow passive losses to offset active income. Consult your CPA before filing.";
+          return {
+            eligible: true,
+            consultationOnly: true,
+            savingsRange: range(0, 0),
+            details: note,
+            tags: ["Real Estate", "Consultation"],
+          };
+        },
+      },
+      {
+        id: "tax_loss_harvesting",
+        name: "Tax Loss Harvesting",
+        description: "Offset taxable income by realizing investment losses strategically.",
+        compute: (ctx) => {
+          if (ctx.hasUnrealizedLosses !== "yes" || !(ctx.unrealizedLossAmount > 0)) return { eligible: false, savingsRange: range(0,0), details: "Requires unrealized investment losses.", tags: ["Investment", "Harvesting"] };
+          const ordinaryOffset = Math.min(ctx.unrealizedLossAmount, 3000);
+          const savingsRange = rangeFromDeduction(ordinaryOffset * 0.9, ordinaryOffset * 1.1, ctx.assumedMarginalRate);
+          const excess = ctx.unrealizedLossAmount - 3000;
+          const excessNote = excess > 0 ? ` Remaining losses of ${money(excess)} can offset capital gains.` : "";
+          return {
+            eligible: true,
+            savingsRange,
+            details: `Ordinary income offset: ${money(ordinaryOffset)} \u00d7 ${pct(ctx.assumedMarginalRate)}.${excessNote}`,
+            tags: ["Investment", "Harvesting"],
+          };
+        },
+      },
+      {
+        id: "income_shifting",
+        name: "Income Shifting Opportunity",
+        description: "With multiple entities, there may be opportunities to shift income to optimize deductions.",
+        compute: (ctx) => {
+          if (!(ctx.numEntities > 1)) return { eligible: false, savingsRange: range(0,0), details: "Requires more than one business entity.", tags: ["Entity Structure", "Consultation"] };
+          return {
+            eligible: true,
+            consultationOnly: true,
+            savingsRange: range(0, 0),
+            details: "With multiple entities, there may be opportunities to shift income to optimize deductions. Discuss with your CPA.",
+            tags: ["Entity Structure", "Consultation"],
+          };
+        },
+      },
     ];
 
     // =========================================================
@@ -1123,7 +1282,19 @@
       stateTaxPaid: document.getElementById("stateTaxPaid"),
       ownsRental: document.getElementById("ownsRental"),
 
-
+      numEntities: document.getElementById("numEntities"),
+      commonOwnership: document.getElementById("commonOwnership"),
+      commonOwnershipWrap: document.getElementById("commonOwnershipWrap"),
+      annualHomeExpenses: document.getElementById("annualHomeExpenses"),
+      bizPhoneInternetPct: document.getElementById("bizPhoneInternetPct"),
+      purchasedEquipment: document.getElementById("purchasedEquipment"),
+      equipmentCost: document.getElementById("equipmentCost"),
+      equipmentCostWrap: document.getElementById("equipmentCostWrap"),
+      equipmentPlacedInService: document.getElementById("equipmentPlacedInService"),
+      equipmentPlacedInServiceWrap: document.getElementById("equipmentPlacedInServiceWrap"),
+      hasUnrealizedLosses: document.getElementById("hasUnrealizedLosses"),
+      unrealizedLossAmount: document.getElementById("unrealizedLossAmount"),
+      unrealizedLossAmountWrap: document.getElementById("unrealizedLossAmountWrap"),
     };
 
     const answers = {
@@ -1146,32 +1317,34 @@
     };
 
     const STEPS = [
-      { title: "Contact" },
-      { title: "State" },
-      { title: "Q1" },
-      { title: "Q2" },
-      { title: "Q3" },
-      { title: "Q4" },
-      { title: "Q5" },
-      { title: "Q6" },
-      { title: "Q7" },
-      { title: "Q8" },
-      { title: "Q9" },
-      { title: "Q10" },
-      { title: "Q11" },
-      { title: "Q12" },
-      { title: "Q13" },
-      { title: "Q14" },
-      { title: "Q15" },
-      { title: "Financials" },
-      { title: "Details" },
-      { title: "Results" },
+      { title: "Contact" },   // 0
+      { title: "State" },     // 1
+      { title: "Q1" },        // 2
+      { title: "Q2" },        // 3
+      { title: "Q3" },        // 4
+      { title: "Q4" },        // 5
+      { title: "Q5" },        // 6
+      { title: "Q6" },        // 7
+      { title: "Q7" },        // 8
+      { title: "Q8" },        // 9
+      { title: "Q9" },        // 10
+      { title: "Q10" },       // 11
+      { title: "Q11" },       // 12
+      { title: "Q12" },       // 13
+      { title: "Q13" },       // 14
+      { title: "Q14" },       // 15
+      { title: "Q15" },       // 16
+      { title: "Additional" }, // 17 (NEW)
+      { title: "Financials" }, // 18
+      { title: "Details" },    // 19
+      { title: "Results" },    // 20
     ];
 
     const STEP_Q15 = 16;
-    const STEP_FINANCIALS = 17;
-    const STEP_DETAILS = 18;
-    const STEP_RESULTS = 19;
+    const STEP_ADDITIONAL = 17;
+    const STEP_FINANCIALS = 18;
+    const STEP_DETAILS = 19;
+    const STEP_RESULTS = 20;
 
     const DEFAULTS = {
       state: "TX",
@@ -1208,6 +1381,15 @@
       saltLimited: "unknown",
       stateTaxPaid: 0,
       ownsRental: "unknown",
+      numEntities: 1,
+      commonOwnership: "no",
+      annualHomeExpenses: 0,
+      bizPhoneInternetPct: 80,
+      purchasedEquipment: "no",
+      equipmentCost: 0,
+      equipmentPlacedInService: "no",
+      hasUnrealizedLosses: "no",
+      unrealizedLossAmount: 0,
     };
 
     let currentStep = 0;
@@ -1270,6 +1452,16 @@
       if (els.saltLimited) els.saltLimited.value = DEFAULTS.saltLimited;
       if (els.stateTaxPaid) els.stateTaxPaid.value = DEFAULTS.stateTaxPaid;
       if (els.ownsRental) els.ownsRental.value = DEFAULTS.ownsRental;
+
+      if (els.numEntities) els.numEntities.value = DEFAULTS.numEntities;
+      if (els.commonOwnership) els.commonOwnership.value = DEFAULTS.commonOwnership;
+      if (els.annualHomeExpenses) els.annualHomeExpenses.value = DEFAULTS.annualHomeExpenses;
+      if (els.bizPhoneInternetPct) els.bizPhoneInternetPct.value = DEFAULTS.bizPhoneInternetPct;
+      if (els.purchasedEquipment) els.purchasedEquipment.value = DEFAULTS.purchasedEquipment;
+      if (els.equipmentCost) els.equipmentCost.value = DEFAULTS.equipmentCost;
+      if (els.equipmentPlacedInService) els.equipmentPlacedInService.value = DEFAULTS.equipmentPlacedInService;
+      if (els.hasUnrealizedLosses) els.hasUnrealizedLosses.value = DEFAULTS.hasUnrealizedLosses;
+      if (els.unrealizedLossAmount) els.unrealizedLossAmount.value = DEFAULTS.unrealizedLossAmount;
 
       syncChoiceSelection(els.q1Buttons, answers.yearsInBusiness);
       syncChoiceSelection(els.q2Buttons, answers.legalEntity);
@@ -1459,6 +1651,16 @@
         saltLimited: (els.saltLimited ? els.saltLimited.value : "unknown"),
         stateTaxPaid: num(els.stateTaxPaid ? els.stateTaxPaid.value : 0),
         ownsRental: (els.ownsRental ? els.ownsRental.value : "unknown"),
+
+        numEntities: num(els.numEntities ? els.numEntities.value : 1),
+        commonOwnership: (els.commonOwnership ? els.commonOwnership.value : "no"),
+        annualHomeExpenses: num(els.annualHomeExpenses ? els.annualHomeExpenses.value : 0),
+        bizPhoneInternetPct: num(els.bizPhoneInternetPct ? els.bizPhoneInternetPct.value : 80),
+        purchasedEquipment: (els.purchasedEquipment ? els.purchasedEquipment.value : "no"),
+        equipmentCost: num(els.equipmentCost ? els.equipmentCost.value : 0),
+        equipmentPlacedInService: (els.equipmentPlacedInService ? els.equipmentPlacedInService.value : "no"),
+        hasUnrealizedLosses: (els.hasUnrealizedLosses ? els.hasUnrealizedLosses.value : "no"),
+        unrealizedLossAmount: num(els.unrealizedLossAmount ? els.unrealizedLossAmount.value : 0),
       };
 
       ctx.assumedMarginalRate = clamp01(
@@ -1497,6 +1699,7 @@
           savingsRange: out.savingsRange,
           details: out.details,
           tags: out.tags || [],
+          consultationOnly: !!out.consultationOnly,
         });
       }
       results.sort((a,b) => (b.savingsRange?.high||0) - (a.savingsRange?.high||0));
@@ -1539,6 +1742,7 @@
 
       if (currentStep === 0) return showStep(1);  // Contact -> State
       if (currentStep === 1) return showStep(2);  // State -> Q1
+      if (currentStep === STEP_ADDITIONAL) return showStep(STEP_FINANCIALS);
       if (currentStep === STEP_FINANCIALS) return showStep(STEP_DETAILS);
       if (currentStep === STEP_DETAILS) return showStep(STEP_RESULTS);
 
@@ -1546,7 +1750,8 @@
     }
 
     function goBack(){
-      if (currentStep === STEP_FINANCIALS) return showStep(STEP_Q15);
+      if (currentStep === STEP_ADDITIONAL) return showStep(STEP_Q15);
+      if (currentStep === STEP_FINANCIALS) return showStep(STEP_ADDITIONAL);
       if (currentStep === STEP_DETAILS) return showStep(STEP_FINANCIALS);
       if (currentStep === STEP_RESULTS) return showStep(STEP_DETAILS);
       showStep(Math.max(0, currentStep - 1));
@@ -1738,10 +1943,22 @@
       lines.push(`Estimated savings range: ${money(totalLow)} \u2013 ${money(totalHigh)}`);
       lines.push(`Strategies applied: ${results.length}`);
       lines.push("");
-      lines.push("Strategy breakdown:");
-      for (const r of results){
+      const estimatedStrategies = results.filter(r => !r.consultationOnly);
+      const consultationStrategies = results.filter(r => r.consultationOnly);
+
+      lines.push("Strategy breakdown (estimated savings):");
+      for (const r of estimatedStrategies){
         lines.push(`  - ${r.name}: ${rangeToMoney(r.savingsRange)}`);
         lines.push(`    ${r.details || ""}`);
+      }
+
+      if (consultationStrategies.length > 0) {
+        lines.push("");
+        lines.push("Strategies requiring CPA review:");
+        for (const r of consultationStrategies){
+          lines.push(`  - ${r.name}: consultation recommended`);
+          lines.push(`    ${r.details || ""}`);
+        }
       }
       lines.push("");
       lines.push("This is a conservative estimate. Schedule a free strategy call to see the full picture.");
@@ -1809,7 +2026,7 @@
         openHomeSqftModal();
       } else {
         answers.homeSqft = 0;
-        showStep(STEP_FINANCIALS);
+        showStep(STEP_ADDITIONAL);
       }
     });
 
@@ -1841,7 +2058,7 @@
       const sqft = clampInt(num(els.homeSqftInput.value), 200, 20000);
       answers.homeSqft = sqft;
       closeHomeSqftModal();
-      showStep(STEP_FINANCIALS);
+      showStep(STEP_ADDITIONAL);
     });
 
     document.addEventListener("keydown", (e) => {
@@ -1862,10 +2079,33 @@
       els.sstb, els.hasKids, els.kidsCount, els.itemize,
       els.charitableGiving, els.saltLimited, els.stateTaxPaid, els.ownsRental,
       els.notes,
+      els.numEntities, els.commonOwnership, els.annualHomeExpenses, els.bizPhoneInternetPct,
+      els.purchasedEquipment, els.equipmentCost, els.equipmentPlacedInService,
+      els.hasUnrealizedLosses, els.unrealizedLossAmount,
     ].filter(Boolean).forEach(el => {
       el.addEventListener("input", tick);
       el.addEventListener("change", tick);
     });
+
+    // Conditional field visibility for Additional Info step
+    function updateAdditionalVisibility(){
+      const numEnt = num(els.numEntities ? els.numEntities.value : 1);
+      if (els.commonOwnershipWrap) els.commonOwnershipWrap.style.display = numEnt > 1 ? "" : "none";
+
+      const purchased = els.purchasedEquipment ? els.purchasedEquipment.value : "no";
+      if (els.equipmentCostWrap) els.equipmentCostWrap.style.display = purchased === "yes" ? "" : "none";
+      if (els.equipmentPlacedInServiceWrap) els.equipmentPlacedInServiceWrap.style.display = purchased === "yes" ? "" : "none";
+
+      const hasLosses = els.hasUnrealizedLosses ? els.hasUnrealizedLosses.value : "no";
+      if (els.unrealizedLossAmountWrap) els.unrealizedLossAmountWrap.style.display = hasLosses === "yes" ? "" : "none";
+    }
+
+    // Wire conditional visibility triggers
+    [els.numEntities, els.purchasedEquipment, els.hasUnrealizedLosses].filter(Boolean).forEach(el => {
+      el.addEventListener("input", updateAdditionalVisibility);
+      el.addEventListener("change", updateAdditionalVisibility);
+    });
+    updateAdditionalVisibility();
 
     // Global guardrails
     window.addEventListener("error", (e) => {
