@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ARK Academy — Tax Planning LITE</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap');
 
     :root{
       /* Ark Academy Brand */
@@ -68,7 +68,7 @@
       flex:0 0 auto;
       border:1px solid rgba(19,59,84,.12);
     }
-    .logo img{width:100%; height:100%; object-fit:contain; display:block; padding:6px; background:#fff;}
+    .logo img{width:100%; height:100%; object-fit:contain; display:block; padding:4px; background:#fff; border-radius:10px;}
     .logo .monogram{font-weight:900; letter-spacing:.06em; color:#0b1220; font-size:12px; padding:10px 8px; background: rgba(255,255,255,.92); border-radius:10px; border:1px solid rgba(19,59,84,.12);}
 
     button{
@@ -113,11 +113,11 @@
 
     .stepper{display:flex; gap:8px; flex-wrap:wrap; padding: 6px 4px 10px;}
     .step{display:flex; align-items:center; gap:8px; border:1px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 10px; color: var(--muted); font-size: 12px; user-select:none;}
-    .step .dot{width:18px; height:18px; border-radius: 999px; border:1px solid rgba(19,59,84,.18); display:grid; place-items:center; font-weight:800; font-size:11px; color: var(--muted); background: rgba(56,111,164,.06);}
-    .step.active{border-color: rgba(56,111,164,.45); color: var(--text); background: rgba(56,111,164,.06);}
-    .step.active .dot{border-color: rgba(56,111,164,.45); color: var(--text); background: rgba(56,111,164,.10);}
-    .step.done{border-color: rgba(34,197,94,.45); color: var(--text);}
-    .step.done .dot{border-color: rgba(34,197,94,.45); color: var(--good);}
+    .step .dot{width:18px; height:18px; border-radius: 999px; border:1px solid rgba(56,111,164,.25); display:grid; place-items:center; font-weight:800; font-size:11px; color: var(--secondary); background: rgba(56,111,164,.08);}
+    .step.active{border-color: var(--secondary); color: #fff; background: var(--secondary);}
+    .step.active .dot{border-color: rgba(255,255,255,.40); color: #fff; background: rgba(255,255,255,.20);}
+    .step.done{border-color: rgba(56,111,164,.45); color: var(--text);}
+    .step.done .dot{border-color: rgba(56,111,164,.45); color: var(--secondary);}
 
     .form{display:grid; grid-template-columns: 1fr 1fr; gap:12px; padding-top: 6px;}
     @media (max-width: 700px){ .form{grid-template-columns: 1fr;} }
@@ -137,13 +137,13 @@
     .kpi{border:1px solid rgba(19,59,84,.14); background: #fff; border-radius: var(--radius2); padding:12px;}
     .kpi .v{font-size:22px; font-weight:800; margin-top:4px;}
     .kpi .s{font-size:12px; color:var(--muted)}
-    .kpi.good .v{color: var(--good)}
+    .kpi.good .v{color: var(--accent)}
 
     .list{display:flex; flex-direction:column; gap:10px; margin-top: 10px;}
     .item{border:1px solid rgba(19,59,84,.14); background: #fff; border-radius: 14px; padding:12px;}
     .itemTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
     .item h4{margin:0; font-size:14px;}
-    .amt{font-weight:900; font-size:14px; color: var(--good);}
+    .amt{font-weight:900; font-size:14px; color: var(--accent);}
     .meta{margin:6px 0 0; font-size:12px; color: var(--muted);}
     .mini{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;}
     .tag{font-size:12px; border:1px solid rgba(19,59,84,.14); padding:6px 10px; border-radius:999px; color: rgba(19,59,84,.72); background: rgba(56,111,164,.06);}
@@ -182,7 +182,7 @@
 
     .progressTop{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom: 10px; color: rgba(19,59,84,.60); font-size: 13px;}
     .progressBar{height: 7px; border-radius: 999px; background: rgba(56,111,164,.18); overflow:hidden; margin-bottom: 18px;}
-    .progressBar > span{display:block; height:100%; width: 0%; background: linear-gradient(90deg, rgba(56,111,164,.85), rgba(169,138,94,.85));}
+    .progressBar > span{display:block; height:100%; width: 0%; background: linear-gradient(90deg, var(--secondary), rgba(56,111,164,.70));}
 
     .questionTitle{margin: 0 0 14px; font-size: 34px; letter-spacing:-0.02em; text-align:center;}
     @media (max-width: 560px){ .questionTitle{font-size: 26px;} }
@@ -203,50 +203,6 @@
     .modalActions{display:flex; gap:10px; justify-content:flex-end; margin-top: 12px;}
     .modalActions button{border-radius: 12px; padding: 12px 14px;}
 
-    /* Results email form */
-    .resultsEmailCard{
-      margin-top: 16px;
-      border: 1px solid rgba(169,138,94,.35);
-      background: rgba(169,138,94,.06);
-      border-radius: var(--radius);
-      padding: 18px;
-    }
-    .resultsEmailCard h4{
-      margin: 0 0 4px;
-      font-size: 16px;
-      font-weight: 800;
-    }
-    .resultsEmailCard p{
-      margin: 0 0 12px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .resultsEmailForm{
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-    }
-    .resultsEmailForm input{
-      flex: 1;
-    }
-    .resultsEmailForm button{
-      white-space: nowrap;
-      padding: 12px 18px;
-    }
-    .emailSuccess{
-      margin-top: 10px;
-      padding: 10px 14px;
-      background: rgba(22,163,74,.08);
-      border: 1px solid rgba(22,163,74,.30);
-      border-radius: 12px;
-      color: var(--good);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    @media (max-width: 560px){
-      .resultsEmailForm{flex-direction: column;}
-      .resultsEmailForm button{width: 100%;}
-    }
 
     /* CTA card on results */
     .ctaCard{
@@ -285,8 +241,8 @@
     <div class="topbar">
       <div class="brand">
         <div class="logo" aria-hidden="true">
-          <img src="ark-logo.svg" alt="Ark Academy" onerror="this.remove();" />
-          <span class="monogram">ARK</span>
+          <img src="ark-logo.png" alt="Ark Academy" onerror="this.style.display='none'; this.parentElement.querySelector('.monogram').style.display='grid';" />
+          <span class="monogram" style="display:none;">ARK</span>
         </div>
         <div>
           <h1 style="font-size:14px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ARK Academy — Tax Planning LITE</h1>
@@ -311,32 +267,8 @@
 
         <div class="stepper" id="stepper"></div>
 
-        <!-- STEP 0: STATE -->
+        <!-- STEP 0: CONTACT INFO -->
         <div class="stepPanel" data-step="0">
-          <div class="form">
-            <div>
-              <label for="state">State</label>
-              <select id="state"></select>
-            </div>
-            <div>
-              <label for="entityType">Tax classification (quick check)</label>
-              <select id="entityType">
-                <option value="sole_prop">Sole Prop / Single-member LLC</option>
-                <option value="s_corp">S-Corp</option>
-                <option value="c_corp">C-Corp</option>
-                <option value="partnership">Partnership / Multi-member LLC</option>
-              </select>
-            </div>
-            <div class="full">
-              <label for="industry">Industry (optional)</label>
-              <input id="industry" placeholder="e.g., e-commerce, construction, consulting" />
-            </div>
-          </div>
-          <p class="hint">Choose your state and continue.</p>
-        </div>
-
-        <!-- STEP 1: CONTACT INFO -->
-        <div class="stepPanel hidden" data-step="1">
           <div class="accountShell">
             <div class="accountCard">
               <h2 class="accountTitle">Enter Your Contact Info</h2>
@@ -372,6 +304,30 @@
               </p>
             </div>
           </div>
+        </div>
+
+        <!-- STEP 1: STATE -->
+        <div class="stepPanel hidden" data-step="1">
+          <div class="form">
+            <div>
+              <label for="state">State</label>
+              <select id="state"></select>
+            </div>
+            <div>
+              <label for="entityType">Tax classification (quick check)</label>
+              <select id="entityType">
+                <option value="sole_prop">Sole Prop / Single-member LLC</option>
+                <option value="s_corp">S-Corp</option>
+                <option value="c_corp">C-Corp</option>
+                <option value="partnership">Partnership / Multi-member LLC</option>
+              </select>
+            </div>
+            <div class="full">
+              <label for="industry">Industry (optional)</label>
+              <input id="industry" placeholder="e.g., e-commerce, construction, consulting" />
+            </div>
+          </div>
+          <p class="hint">Choose your state and continue.</p>
         </div>
 
         <!-- STEP 2: QUESTION 1 of 15 -->
@@ -822,30 +778,6 @@
           </div>
           <div class="list" id="strategyList"></div>
 
-          <!-- Results email form -->
-          <div class="resultsEmailCard" id="resultsEmailCard">
-            <h4>Want a copy of your results?</h4>
-            <p>Enter your email and we'll send you a full summary of your tax savings estimate.</p>
-            <form id="resultsEmailForm" class="resultsEmailForm">
-              <div style="flex:1;">
-                <label for="resultsEmail">Email address</label>
-                <input id="resultsEmail" type="email" placeholder="you@example.com" required />
-              </div>
-              <button class="primary" type="submit">Send My Results</button>
-            </form>
-            <div id="emailSuccessMsg" class="emailSuccess hidden">Your results have been sent! Check your inbox.</div>
-          </div>
-
-          <div class="actions" style="margin-top:14px; border-top:0; padding-top:0;">
-            <div class="left" style="justify-content:flex-start;">
-              <button id="btnPdf" class="primary" type="button">Download PDF report</button>
-            </div>
-            <div class="right" style="justify-content:flex-end;"></div>
-          </div>
-
-          <p class="footerNote" style="border-top:0; padding-top:0; margin-top:10px;">
-            Tip: "Download PDF report" opens a print-ready report in a new tab. Choose <span class="mono">Print &rarr; Save as PDF</span>.
-          </p>
         </div>
 
         <div class="actions" id="actionsRow">
@@ -1124,7 +1056,6 @@
     const els = {
       appWrap: document.getElementById("appWrap"),
 
-      btnPdf: document.getElementById("btnPdf"),
       stepper: document.getElementById("stepper"),
       panels: Array.from(document.querySelectorAll(".stepPanel")),
       actionsRow: document.getElementById("actionsRow"),
@@ -1216,10 +1147,6 @@
       kpiCount: document.getElementById("kpiCount"),
       kpiTaxable: document.getElementById("kpiTaxable"),
 
-      resultsEmailForm: document.getElementById("resultsEmailForm"),
-      resultsEmail: document.getElementById("resultsEmail"),
-      emailSuccessMsg: document.getElementById("emailSuccessMsg"),
-      resultsEmailCard: document.getElementById("resultsEmailCard"),
     };
 
     const answers = {
@@ -1242,8 +1169,8 @@
     };
 
     const STEPS = [
-      { title: "State" },
       { title: "Contact" },
+      { title: "State" },
       { title: "Q1" },
       { title: "Q2" },
       { title: "Q3" },
@@ -1309,7 +1236,7 @@
     let currentStep = 0;
 
     // Formspree placeholder endpoint — replace with your real endpoint
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/myknpdwv";
 
     function populateStates(){
       const states = [
@@ -1570,14 +1497,14 @@
 
     function validateForStep(ctx, stepIdx){
       const issues = [];
-      if (stepIdx >= 0 && !ctx.state) issues.push("Please select a state.");
-      if (stepIdx >= 1) {
+      if (stepIdx >= 0) {
         if (!ctx.firstName) issues.push("First name is required.");
         if (!ctx.lastName) issues.push("Last name is required.");
         if (!ctx.businessName) issues.push("Business name is required.");
         if (!ctx.mobilePhone) issues.push("Mobile phone is required.");
         if (!ctx.email || !ctx.email.includes("@")) issues.push("A valid email is required.");
       }
+      if (stepIdx >= 1 && !ctx.state) issues.push("Please select a state.");
       return issues;
     }
 
@@ -1612,12 +1539,8 @@
       els.kpiCount.textContent = String(results.length);
       els.kpiTaxable.textContent = money(taxable);
 
-      if (els.btnPdf) {
-        els.btnPdf.onclick = () => {
-          const fresh = readInputs();
-          openReportPrintView(fresh, computeResults(fresh));
-        };
-      }
+      // Auto-send results to academy inbox
+      sendResultsToAcademy();
 
       els.strategyList.innerHTML = results.map(r => {
         return `
@@ -1662,8 +1585,8 @@
         return;
       }
 
-      if (currentStep === 0) return showStep(1);
-      if (currentStep === 1) return showStep(2);
+      if (currentStep === 0) return showStep(1);  // Contact -> State
+      if (currentStep === 1) return showStep(2);  // State -> Q1
       if (currentStep === STEP_FINANCIALS) return showStep(STEP_DETAILS);
       if (currentStep === STEP_DETAILS) return showStep(STEP_RESULTS);
 
@@ -1879,24 +1802,22 @@
     // EMAIL RESULTS VIA FORMSPREE
     // =========================================================
 
-    function sendResultsEmail(userEmail){
+    function sendResultsToAcademy(){
       const ctx = readInputs();
       const results = computeResults(ctx);
       const summary = buildResultsSummaryText(ctx, results);
 
       const payload = {
-        _replyto: userEmail,
-        email: userEmail,
-        _cc: "academy@arkfinancial.com",
+        email: "academy@arkfinancial.com",
         _subject: `ARK Tax Planning LITE Results: ${ctx.businessName || ctx.firstName || "Client"}`,
         message: summary,
       };
 
-      return fetch(FORMSPREE_ENDPOINT, {
+      fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify(payload),
-      });
+      }).catch(() => {/* silent — internal notification only */});
     }
 
     // =========================================================
@@ -1911,40 +1832,9 @@
 
     els.btnCreateAccount.addEventListener("click", () => {
       const ctx = readInputs();
-      const issues = validateForStep(ctx, 1);
+      const issues = validateForStep(ctx, 0);
       if (issues.length) return toast(issues[0]);
-      showStep(2);
-    });
-
-    // Results email form
-    els.resultsEmailForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const emailVal = (els.resultsEmail.value || "").trim();
-      if (!emailVal || !emailVal.includes("@")) {
-        toast("Please enter a valid email address.");
-        return;
-      }
-
-      const submitBtn = els.resultsEmailForm.querySelector("button[type=submit]");
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Sending...";
-
-      sendResultsEmail(emailVal)
-        .then(resp => {
-          if (resp.ok) {
-            els.emailSuccessMsg.classList.remove("hidden");
-            els.resultsEmailForm.classList.add("hidden");
-          } else {
-            toast("Could not send email. Please try again.");
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Send My Results";
-          }
-        })
-        .catch(() => {
-          toast("Could not send email. Please try again.");
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Send My Results";
-        });
+      showStep(1);
     });
 
     wireChoiceGroup(els.q1Buttons, "yearsInBusiness", () => showStep(3));
