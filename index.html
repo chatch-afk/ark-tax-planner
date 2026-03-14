@@ -204,35 +204,45 @@
     .modalActions button{border-radius: 12px; padding: 12px 14px;}
 
 
-    /* CTA card on results */
-    .ctaCard{
-      margin-top: 16px;
-      border: 2px solid rgba(169,138,94,.40);
-      background: linear-gradient(135deg, rgba(19,59,84,.04), rgba(169,138,94,.08));
-      border-radius: var(--radius);
-      padding: 20px;
+    /* Thank you card */
+    .thankYouCard{
       text-align: center;
+      padding: 40px 20px;
     }
-    .ctaCard p{
+    .thankYouIcon{
+      width: 64px; height: 64px;
+      margin: 0 auto 20px;
+      background: rgba(34,197,94,.12);
+      border: 2px solid rgba(34,197,94,.35);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; color: var(--good); font-weight: 800;
+    }
+    .thankYouCard h2{
       margin: 0 0 12px;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .thankYouCard p{
+      margin: 0 0 24px;
       font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 480px;
+      margin-left: auto; margin-right: auto;
+    }
+    .thankYouGuarantee{
+      margin: 0 auto;
+      max-width: 480px;
+      padding: 16px;
+      background: rgba(169,138,94,.06);
+      border: 1px solid rgba(169,138,94,.30);
+      border-radius: var(--radius);
+      font-size: 13px;
       color: var(--muted);
       line-height: 1.5;
     }
-    .ctaCard a{
-      display: inline-block;
-      background: linear-gradient(135deg, var(--accent), rgba(169,138,94,.82));
-      border: 1px solid rgba(169,138,94,.55);
-      color: #0b1220;
-      padding: 14px 28px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 15px;
-      text-decoration: none;
-      transition: filter .15s;
-    }
-    .ctaCard a:hover{filter: brightness(1.05);}
-    .ctaCard a:active{transform: translateY(1px);}
   </style>
 </head>
 
@@ -742,42 +752,14 @@
 
         <!-- STEP 19: RESULTS -->
         <div class="stepPanel hidden" data-step="19">
-          <div class="kpis">
-            <div class="kpi good">
-              <div class="s">Estimated total savings</div>
-              <div class="v" id="kpiTotal">$0</div>
-            </div>
-            <div class="kpi">
-              <div class="s">Effective savings rate (of net profit)</div>
-              <div class="v" id="kpiRate">0%</div>
-            </div>
-            <div class="kpi">
-              <div class="s"># strategies applied</div>
-              <div class="v" id="kpiCount">0</div>
-            </div>
-            <div class="kpi">
-              <div class="s">Taxable income (rough)</div>
-              <div class="v" id="kpiTaxable">$0</div>
+          <div class="thankYouCard">
+            <div class="thankYouIcon">&#10003;</div>
+            <h2>Thank You!</h2>
+            <p>Your information has been submitted successfully. A member of the Ark Academy team will be reaching out to review your results and schedule a strategy call.</p>
+            <div class="thankYouGuarantee">
+              <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
             </div>
           </div>
-
-          <!-- CTA below savings estimate -->
-          <div class="ctaCard">
-            <p>This is a conservative estimate. Schedule a free strategy call to see the full picture.</p>
-            <a href="#">Schedule a Free Strategy Call</a>
-          </div>
-
-          <div class="footerNote">
-            <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee. This calculator provides a conservative preview only and is not the final determination of savings.
-          </div>
-
-          <div style="margin-top:14px"></div>
-          <div class="sectionTitle">
-            <h3>Strategy breakdown</h3>
-            <div class="pill">Shown at the end</div>
-          </div>
-          <div class="list" id="strategyList"></div>
-
         </div>
 
         <div class="actions" id="actionsRow">
@@ -1064,7 +1046,6 @@
       btnNext: document.getElementById("btnNext"),
       toast: document.getElementById("toast"),
       statusPill: document.getElementById("statusPill"),
-      strategyList: document.getElementById("strategyList"),
 
       state: document.getElementById("state"),
       entityType: document.getElementById("entityType"),
@@ -1142,10 +1123,6 @@
       stateTaxPaid: document.getElementById("stateTaxPaid"),
       ownsRental: document.getElementById("ownsRental"),
 
-      kpiTotal: document.getElementById("kpiTotal"),
-      kpiRate: document.getElementById("kpiRate"),
-      kpiCount: document.getElementById("kpiCount"),
-      kpiTaxable: document.getElementById("kpiTaxable"),
 
     };
 
@@ -1526,37 +1503,12 @@
       return results;
     }
 
+    let resultsSent = false;
     function renderResults(ctx){
-      const results = computeResults(ctx);
-      const totalHigh = results.reduce((sum,r) => sum + (r.savingsRange?.high||0), 0);
-      const totalLow  = results.reduce((sum,r) => sum + (r.savingsRange?.low||0), 0);
-
-      const taxable = Math.max(0, ctx.netIncome - ctx.retirementContrib - ctx.healthPremiums);
-      const rate = ctx.netIncome > 0 ? (totalHigh / ctx.netIncome) : 0;
-
-      els.kpiTotal.textContent = `${money(totalLow)} \u2013 ${money(totalHigh)}`;
-      els.kpiRate.textContent = pct(rate);
-      els.kpiCount.textContent = String(results.length);
-      els.kpiTaxable.textContent = money(taxable);
-
-      // Auto-send results to academy inbox
-      sendResultsToAcademy();
-
-      els.strategyList.innerHTML = results.map(r => {
-        return `
-          <div class="item">
-            <div class="itemTop">
-              <div>
-                <h4>${escapeHtml(r.name)}</h4>
-                <p class="meta">${escapeHtml(r.description)}</p>
-              </div>
-              <div class="amt">${rangeToMoney(r.savingsRange)}</div>
-            </div>
-            <p class="meta">${escapeHtml(r.details || "")}</p>
-            <div class="mini">${(r.tags||[]).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
-          </div>
-        `;
-      }).join("");
+      if (!resultsSent) {
+        resultsSent = true;
+        sendResultsToAcademy();
+      }
     }
 
     function tick(){
