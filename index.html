@@ -1,0 +1,2048 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARK Academy — Tax Planning LITE</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root{
+      /* Ark Academy Brand */
+      --primary:#133B54;   /* Deep Navy */
+      --secondary:#386FA4; /* Blue */
+      --accent:#A98A5E;    /* Gold */
+
+      /* UI surfaces */
+      --bg:#F7F8FA;
+      --surface:#FFFFFF;
+      --surface2:#FFFFFF;
+      --text:var(--primary);
+      --muted:rgba(19,59,84,.66);
+      --line:rgba(19,59,84,.14);
+
+      --good:#16a34a;
+      --warn:#d97706;
+      --shadow: 0 18px 45px rgba(19,59,84,.10);
+      --radius:18px;
+      --radius2:12px;
+      --max:1100px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: "DM Sans", Calibri, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(900px 560px at 18% 10%, rgba(56,111,164,.22), transparent 60%),
+        radial-gradient(900px 560px at 85% 20%, rgba(169,138,94,.18), transparent 58%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.35;
+    }
+
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 16px 64px;}
+
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; padding:10px 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      position:sticky; top:12px; z-index:50;
+    }
+
+    .brand{display:flex; align-items:center; gap:10px; padding-left:8px; min-width:0;}
+
+    .logo{
+      width:40px; height:40px; border-radius:12px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(19,59,84,1), rgba(56,111,164,1));
+      box-shadow: 0 10px 24px rgba(56,111,164,.20);
+      overflow:hidden;
+      flex:0 0 auto;
+      border:1px solid rgba(19,59,84,.12);
+    }
+    .logo img{width:100%; height:100%; object-fit:contain; display:block; padding:6px; background:#fff;}
+    .logo .monogram{font-weight:900; letter-spacing:.06em; color:#0b1220; font-size:12px; padding:10px 8px; background: rgba(255,255,255,.92); border-radius:10px; border:1px solid rgba(19,59,84,.12);}
+
+    button{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.85);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+    }
+    button.primary{
+      background: linear-gradient(135deg, var(--accent), rgba(169,138,94,.82));
+      border-color: rgba(169,138,94,.55);
+      color: #0b1220;
+    }
+    button.ghost{background: transparent;}
+    button:disabled{opacity:.45; cursor:not-allowed;}
+    button:hover{filter:brightness(1.05)}
+    button:active{transform: translateY(1px)}
+
+    .hero{padding:26px 6px 10px;}
+    .hero h2{font-size:30px; margin:14px 0 8px; letter-spacing:-0.02em;}
+    .hero p{margin:0; color:var(--muted); max-width: 70ch; font-size:15px; line-height:1.55;}
+
+    .grid{display:grid; grid-template-columns: 1fr; gap:14px; margin-top: 14px; align-items:start;}
+    @media (max-width: 980px){ .topbar{border-radius: 22px;} }
+
+    .card{
+      border:1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3{margin:4px 0 8px; font-size:14px; color: var(--muted); font-weight:700; letter-spacing:.02em;}
+
+    .sectionTitle{display:flex; align-items:center; justify-content:space-between; gap:10px; padding: 6px 4px 10px;}
+    .pill{font-size:12px; color:var(--muted); border:1px solid var(--line); padding:6px 10px; border-radius: 999px; background: rgba(255,255,255,.72);}
+
+    .stepper{display:flex; gap:8px; flex-wrap:wrap; padding: 6px 4px 10px;}
+    .step{display:flex; align-items:center; gap:8px; border:1px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 10px; color: var(--muted); font-size: 12px; user-select:none;}
+    .step .dot{width:18px; height:18px; border-radius: 999px; border:1px solid rgba(19,59,84,.18); display:grid; place-items:center; font-weight:800; font-size:11px; color: var(--muted); background: rgba(56,111,164,.06);}
+    .step.active{border-color: rgba(56,111,164,.45); color: var(--text); background: rgba(56,111,164,.06);}
+    .step.active .dot{border-color: rgba(56,111,164,.45); color: var(--text); background: rgba(56,111,164,.10);}
+    .step.done{border-color: rgba(34,197,94,.45); color: var(--text);}
+    .step.done .dot{border-color: rgba(34,197,94,.45); color: var(--good);}
+
+    .form{display:grid; grid-template-columns: 1fr 1fr; gap:12px; padding-top: 6px;}
+    @media (max-width: 700px){ .form{grid-template-columns: 1fr;} }
+
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px;}
+    input, select, textarea{width:100%; padding:12px 12px; border-radius: 12px; border:1px solid rgba(19,59,84,.18); background: #fff; color: var(--primary); outline:none; font-size:14px;}
+    textarea{min-height: 84px; resize: vertical;}
+    input:focus, select:focus, textarea:focus{border-color: rgba(56,111,164,.60); box-shadow: 0 0 0 4px rgba(56,111,164,.15);}
+    .full{grid-column: 1 / -1;}
+    .hint{font-size:12px; color:var(--muted); margin-top:8px;}
+
+    .actions{display:flex; gap:10px; justify-content:space-between; align-items:center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);}
+    .actions .left, .actions .right{display:flex; gap:8px; flex-wrap:wrap;}
+
+    .kpis{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 6px;}
+    @media (max-width: 700px){ .kpis{grid-template-columns: 1fr;} }
+    .kpi{border:1px solid rgba(19,59,84,.14); background: #fff; border-radius: var(--radius2); padding:12px;}
+    .kpi .v{font-size:22px; font-weight:800; margin-top:4px;}
+    .kpi .s{font-size:12px; color:var(--muted)}
+    .kpi.good .v{color: var(--good)}
+
+    .list{display:flex; flex-direction:column; gap:10px; margin-top: 10px;}
+    .item{border:1px solid rgba(19,59,84,.14); background: #fff; border-radius: 14px; padding:12px;}
+    .itemTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+    .item h4{margin:0; font-size:14px;}
+    .amt{font-weight:900; font-size:14px; color: var(--good);}
+    .meta{margin:6px 0 0; font-size:12px; color: var(--muted);}
+    .mini{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;}
+    .tag{font-size:12px; border:1px solid rgba(19,59,84,.14); padding:6px 10px; border-radius:999px; color: rgba(19,59,84,.72); background: rgba(56,111,164,.06);}
+
+    .footerNote{margin-top:10px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 10px;}
+    .mono{font-family: var(--mono);}
+
+    .toast{position: fixed; right: 14px; bottom: 14px; background: rgba(255,255,255,.96); border: 1px solid var(--line); color: var(--primary); padding: 10px 12px; border-radius: 12px; box-shadow: var(--shadow); opacity: 0; transform: translateY(8px); pointer-events:none; transition: .2s ease; font-size: 13px;}
+    .toast.show{opacity:1; transform: translateY(0px);}
+
+    .hidden{display:none !important;}
+
+    /* Account + Question step styling */
+    .accountShell{padding: 6px 2px 2px;}
+    .accountCard{
+      width: min(820px, 100%);
+      margin: 6px auto 0;
+      background: var(--surface2);
+      color: var(--primary);
+      border: 1px solid rgba(19,59,84,.14);
+      border-radius: 18px;
+      box-shadow: 0 18px 55px rgba(19,59,84,.12);
+      padding: 22px 22px 18px;
+    }
+    @media (max-width: 560px){ .accountCard{padding:18px 14px 14px;} }
+
+    .accountTitle{margin: 0 0 6px; font-size: 32px; letter-spacing: -0.02em;}
+    .accountSub{margin: 0 0 18px; color: rgba(19,59,84,.70);}
+    .accountForm label{color: rgba(19,59,84,.70);}
+    .accountForm input{background: #fff; color:var(--primary); border-color: rgba(19,59,84,.22);}
+    .accountForm input:focus{border-color: rgba(56,111,164,.65); box-shadow: 0 0 0 4px rgba(56,111,164,.14);}
+    .accountCTA{width: 100%; margin-top: 14px; border: 1px solid rgba(169,138,94,.55); background: linear-gradient(135deg, var(--accent), rgba(169,138,94,.85)); color: #0b1220; padding: 14px 14px; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer;}
+    .accountCTA:hover{filter: brightness(1.02);}
+    .accountCTA:active{transform: translateY(1px);}
+    .accountFineprint{margin: 14px 0 0; font-size: 11.5px; line-height: 1.4; color: rgba(19,59,84,.60);}
+
+    .progressTop{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom: 10px; color: rgba(19,59,84,.60); font-size: 13px;}
+    .progressBar{height: 7px; border-radius: 999px; background: rgba(56,111,164,.18); overflow:hidden; margin-bottom: 18px;}
+    .progressBar > span{display:block; height:100%; width: 0%; background: linear-gradient(90deg, rgba(56,111,164,.85), rgba(169,138,94,.85));}
+
+    .questionTitle{margin: 0 0 14px; font-size: 34px; letter-spacing:-0.02em; text-align:center;}
+    @media (max-width: 560px){ .questionTitle{font-size: 26px;} }
+
+    .choiceGroup{display:flex; flex-direction:column; gap:12px; margin-top: 8px;}
+    .choice{width: 100%; text-align:left; background: #fff; color: #0f172a; border: 1px solid rgba(19,59,84,.18); padding: 16px 16px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;}
+    .choice:hover{filter: brightness(0.99);}
+    .choice.selected{border-color: rgba(56,111,164,.70); box-shadow: 0 0 0 4px rgba(56,111,164,.12); color: rgba(56,111,164,1);}
+    .choiceBack{display:flex; justify-content:center; margin-top: 14px;}
+
+    /* Modal */
+    .modalOverlay{position: fixed; inset: 0; background: rgba(19,59,84,.55); backdrop-filter: blur(4px); display:none; align-items:center; justify-content:center; padding: 14px; z-index: 1000;}
+    .modalOverlay.show{display:flex;}
+    .modalCard{width: 100%; max-width: 560px; background: rgba(255,255,255,.98); color:#0f172a; border:1px solid rgba(19,59,84,.14); border-radius: 16px; box-shadow: 0 18px 55px rgba(0,0,0,.22); padding: 18px;}
+    .modalCard h3{margin: 0 0 6px; font-size: 20px;}
+    .modalCard p{margin: 0 0 12px; color: rgba(19,59,84,.72); font-size: 13px;}
+    .modalCard label{color: rgba(19,59,84,.72);}
+    .modalActions{display:flex; gap:10px; justify-content:flex-end; margin-top: 12px;}
+    .modalActions button{border-radius: 12px; padding: 12px 14px;}
+
+    /* Results email form */
+    .resultsEmailCard{
+      margin-top: 16px;
+      border: 1px solid rgba(169,138,94,.35);
+      background: rgba(169,138,94,.06);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+    .resultsEmailCard h4{
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .resultsEmailCard p{
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .resultsEmailForm{
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .resultsEmailForm input{
+      flex: 1;
+    }
+    .resultsEmailForm button{
+      white-space: nowrap;
+      padding: 12px 18px;
+    }
+    .emailSuccess{
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: rgba(22,163,74,.08);
+      border: 1px solid rgba(22,163,74,.30);
+      border-radius: 12px;
+      color: var(--good);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    @media (max-width: 560px){
+      .resultsEmailForm{flex-direction: column;}
+      .resultsEmailForm button{width: 100%;}
+    }
+
+    /* CTA card on results */
+    .ctaCard{
+      margin-top: 16px;
+      border: 2px solid rgba(169,138,94,.40);
+      background: linear-gradient(135deg, rgba(19,59,84,.04), rgba(169,138,94,.08));
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+    }
+    .ctaCard p{
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .ctaCard a{
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), rgba(169,138,94,.82));
+      border: 1px solid rgba(169,138,94,.55);
+      color: #0b1220;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 15px;
+      text-decoration: none;
+      transition: filter .15s;
+    }
+    .ctaCard a:hover{filter: brightness(1.05);}
+    .ctaCard a:active{transform: translateY(1px);}
+  </style>
+</head>
+
+<body>
+  <div class="wrap" id="appWrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <img src="ark-logo.svg" alt="Ark Academy" onerror="this.remove();" />
+          <span class="monogram">ARK</span>
+        </div>
+        <div>
+          <h1 style="font-size:14px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ARK Academy — Tax Planning LITE</h1>
+          <p style="margin:0; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Quick assessment &bull; conservative preview</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h2>Estimate potential tax savings with your strategies</h2>
+      <p>
+        This assessment provides a conservative preview of potential tax-saving opportunities. Our advisory review goes deeper — and is backed by a <strong>$12,000 minimum savings identification guarantee</strong>.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="wizardCard">
+        <div class="sectionTitle">
+          <h3>Calculator</h3>
+          <div class="pill" id="statusPill">Ready</div>
+        </div>
+
+        <div class="stepper" id="stepper"></div>
+
+        <!-- STEP 0: STATE -->
+        <div class="stepPanel" data-step="0">
+          <div class="form">
+            <div>
+              <label for="state">State</label>
+              <select id="state"></select>
+            </div>
+            <div>
+              <label for="entityType">Tax classification (quick check)</label>
+              <select id="entityType">
+                <option value="sole_prop">Sole Prop / Single-member LLC</option>
+                <option value="s_corp">S-Corp</option>
+                <option value="c_corp">C-Corp</option>
+                <option value="partnership">Partnership / Multi-member LLC</option>
+              </select>
+            </div>
+            <div class="full">
+              <label for="industry">Industry (optional)</label>
+              <input id="industry" placeholder="e.g., e-commerce, construction, consulting" />
+            </div>
+          </div>
+          <p class="hint">Choose your state and continue.</p>
+        </div>
+
+        <!-- STEP 1: CONTACT INFO -->
+        <div class="stepPanel hidden" data-step="1">
+          <div class="accountShell">
+            <div class="accountCard">
+              <h2 class="accountTitle">Enter Your Contact Info</h2>
+              <p class="accountSub">Get your conservative preview — then we'll show which strategies may apply.</p>
+
+              <div class="form accountForm">
+                <div>
+                  <label for="firstName">First Name</label>
+                  <input id="firstName" placeholder="John" autocomplete="given-name" />
+                </div>
+                <div>
+                  <label for="lastName">Last Name</label>
+                  <input id="lastName" placeholder="Smith" autocomplete="family-name" />
+                </div>
+                <div class="full">
+                  <label for="businessName">Business Name</label>
+                  <input id="businessName" placeholder="ABC Company LLC" autocomplete="organization" />
+                </div>
+                <div class="full">
+                  <label for="mobilePhone">Mobile Phone</label>
+                  <input id="mobilePhone" placeholder="(555) 123-4567" inputmode="tel" autocomplete="tel" />
+                </div>
+                <div class="full">
+                  <label for="email">Email Address</label>
+                  <input id="email" placeholder="john@example.com" inputmode="email" autocomplete="email" />
+                </div>
+              </div>
+
+              <button class="accountCTA" id="btnCreateAccount" type="button">Continue</button>
+
+              <p class="accountFineprint">
+                <em>*By filling out the Form above, you agree to the Terms of Use and Privacy Policy, and includes approval to receive occasional calls, pre-recorded notices, or text messages using automation, including automatic dialing systems, at the number provided. Consent is not a condition of usage. Reply STOP to end text messages. Normal cell phone charges may apply.</em>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: QUESTION 1 of 15 -->
+        <div class="stepPanel hidden" data-step="2" data-q="1">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 1 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">How many years have you been in business?</h2>
+            <div class="choiceGroup" id="yearsInBusiness">
+              <button class="choice" data-value="lt1" type="button">Less than 1 year</button>
+              <button class="choice selected" data-value="1to5" type="button">1–5 years</button>
+              <button class="choice" data-value="gt5" type="button">More than 5 years</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ1" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 3: QUESTION 2 of 15 -->
+        <div class="stepPanel hidden" data-step="3" data-q="2">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 2 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">What legal entity do you currently use for your business?</h2>
+            <div class="choiceGroup" id="legalEntity">
+              <button class="choice selected" data-value="llc" type="button">LLC</button>
+              <button class="choice" data-value="inc" type="button">Inc</button>
+              <button class="choice" data-value="sole_prop" type="button">Sole Proprietor</button>
+              <button class="choice" data-value="partnership" type="button">Partnership</button>
+              <button class="choice" data-value="none" type="button">I don't have a legal entity set up</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ2" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 4: QUESTION 3 of 15 (TAXATION TYPE) -->
+        <div class="stepPanel hidden" data-step="4" data-q="3">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 3 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">How is your business currently taxed for federal income taxes?</h2>
+            <div class="choiceGroup" id="taxTreatment">
+              <button class="choice selected" data-value="sole_prop" type="button">Sole proprietor / Disregarded entity (Schedule C)</button>
+              <button class="choice" data-value="partnership" type="button">Partnership (Form 1065)</button>
+              <button class="choice" data-value="s_corp" type="button">S-Corp (Form 1120-S)</button>
+              <button class="choice" data-value="c_corp" type="button">C-Corp (Form 1120)</button>
+              <button class="choice" data-value="unknown" type="button">I don't know</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ3" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 5: QUESTION 4 of 15 -->
+        <div class="stepPanel hidden" data-step="5" data-q="4">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 4 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">What's your expected annual revenue (or gross sales) this year?</h2>
+            <div class="choiceGroup" id="revenueRange">
+              <button class="choice" data-value="1_to_100k" type="button">$1 to $100k</button>
+              <button class="choice" data-value="100k_to_250k" type="button">$100k to $250k</button>
+              <button class="choice" data-value="250k_to_500k" type="button">$250k to $500k</button>
+              <button class="choice" data-value="500k_to_1m" type="button">$500k to $1M</button>
+              <button class="choice" data-value="1m_to_5m" type="button">$1M to $5M</button>
+              <button class="choice" data-value="5m_to_10m" type="button">$5M to $10M</button>
+              <button class="choice" data-value="over_10m" type="button">Over $10M</button>
+              <button class="choice" data-value="none" type="button">None</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ4" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 6: QUESTION 5 of 15 -->
+        <div class="stepPanel hidden" data-step="6" data-q="5">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 5 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">What's your estimated net income (profit) this year?</h2>
+            <div class="choiceGroup" id="netIncomeRange">
+              <button class="choice" data-value="0_to_50k" type="button">$0 to $50k</button>
+              <button class="choice" data-value="50k_to_100k" type="button">$50k to $100k</button>
+              <button class="choice" data-value="100k_to_150k" type="button">$100k to $150k</button>
+              <button class="choice" data-value="150k_to_300k" type="button">$150k to $300k</button>
+              <button class="choice" data-value="300k_to_500k" type="button">$300k to $500k</button>
+              <button class="choice" data-value="over_500k" type="button">Over $500k</button>
+              <button class="choice" data-value="none" type="button">None</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ5" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 7: QUESTION 6 of 15 -->
+        <div class="stepPanel hidden" data-step="7" data-q="6">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 6 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">Do you have full or part-time employees?</h2>
+            <div class="choiceGroup" id="hasEmployees">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ6" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 8: QUESTION 7 of 15 -->
+        <div class="stepPanel hidden" data-step="8" data-q="7">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 7 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">Do you utilize a HSA (Health Savings Account) or HRA (Health Reimbursement Account) in your business?</h2>
+            <div class="choiceGroup" id="usesHsaHra">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ7" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 9: QUESTION 8 of 15 -->
+        <div class="stepPanel hidden" data-step="9" data-q="8">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 8 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">What retirement plan do you have in place for your business?</h2>
+            <div class="choiceGroup" id="retirementPlan">
+              <button class="choice" data-value="none_qualified" type="button">I don't have a qualified retirement plan</button>
+              <button class="choice" data-value="ira" type="button">IRA</button>
+              <button class="choice" data-value="sep_ira" type="button">SEP IRA</button>
+              <button class="choice" data-value="traditional_401k" type="button">Traditional 401k</button>
+              <button class="choice" data-value="solo_401k" type="button">Solo 401k</button>
+              <button class="choice" data-value="other" type="button">Other</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ8" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 10: QUESTION 9 of 15 -->
+        <div class="stepPanel hidden" data-step="10" data-q="9">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 9 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">How often do you meet with your current accountant or CPA to adjust your tax plan?</h2>
+            <div class="choiceGroup" id="cpaMeetings">
+              <button class="choice" data-value="once" type="button">Once per year</button>
+              <button class="choice" data-value="twice" type="button">Twice per year</button>
+              <button class="choice" data-value="three" type="button">Three times per year</button>
+              <button class="choice" data-value="more_than_3" type="button">More than 3 times per year</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ9" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 11: QUESTION 10 of 15 -->
+        <div class="stepPanel hidden" data-step="11" data-q="10">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 10 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">Do you have an estate plan, will, health care directive, or power of attorney in place?</h2>
+            <div class="choiceGroup" id="hasEstatePlan">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ10" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 12: QUESTION 11 of 15 -->
+        <div class="stepPanel hidden" data-step="12" data-q="11">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 11 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">Do you utilize a trust or series of trusts to protect your personal and business assets?</h2>
+            <div class="choiceGroup" id="usesTrusts">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ11" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 13: QUESTION 12 of 15 -->
+        <div class="stepPanel hidden" data-step="13" data-q="12">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 12 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">Do you use a mobile app to track mileage and other business deductions for your business?</h2>
+            <div class="choiceGroup" id="tracksMileage">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ12" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 14: QUESTION 13 of 15 -->
+        <div class="stepPanel hidden" data-step="14" data-q="13">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 13 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">I'm confident my accountant is maximizing all possible deductions for my business and keeping me compliant with changing tax codes.</h2>
+            <div class="choiceGroup" id="q12">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ13" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 15: QUESTION 14 of 15 -->
+        <div class="stepPanel hidden" data-step="15" data-q="14">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 14 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">Are you using the home-office deduction for your business?</h2>
+            <div class="choiceGroup" id="q13">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ14" type="button">&#8249; Go Back</button></div>
+          </div></div>
+        </div>
+
+        <!-- STEP 16: QUESTION 15 of 15 (HOME OWNERSHIP + SQFT MODAL) -->
+        <div class="stepPanel hidden" data-step="16" data-q="15">
+          <div class="accountShell"><div class="accountCard">
+            <div class="progressTop"><div class="progressLabel qLabel">Question 15 of 15</div><div class="progressPct qPct">0% Complete</div></div>
+            <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
+            <h2 class="questionTitle">Do you own a home?</h2>
+            <div class="choiceGroup" id="q15">
+              <button class="choice" data-value="yes" type="button">Yes</button>
+              <button class="choice" data-value="no" type="button">No</button>
+            </div>
+            <div class="choiceBack"><button class="ghost" id="btnGoBackQ15" type="button">&#8249; Go Back</button></div>
+
+            <!-- Sq ft modal (opens only if they select Yes) -->
+            <div class="modalOverlay" id="homeSqftModal" role="dialog" aria-modal="true" aria-labelledby="homeSqftTitle">
+              <div class="modalCard">
+                <h3 id="homeSqftTitle">What is the approximate square footage of your home?</h3>
+                <p>We estimate Augusta Rule rent at <strong>$0.75 per sq ft per day</strong> for <strong>14 days</strong>.</p>
+                <div>
+                  <label for="homeSqftInput">Home square footage</label>
+                  <input id="homeSqftInput" type="number" min="200" step="100" placeholder="e.g., 2400" />
+                </div>
+                <div class="modalActions">
+                  <button class="ghost" type="button" id="btnHomeSqftCancel">Cancel</button>
+                  <button class="primary" type="button" id="btnHomeSqftContinue">Continue</button>
+                </div>
+              </div>
+            </div>
+
+          </div></div>
+        </div>
+
+        <!-- STEP 17: FINANCIALS -->
+        <div class="stepPanel hidden" data-step="17">
+          <div class="form">
+            <div>
+              <label for="revenue">Annual revenue</label>
+              <input id="revenue" type="number" min="0" step="1000" placeholder="e.g., 500000" />
+            </div>
+            <div>
+              <label for="netIncome">Net profit (before strategies)</label>
+              <input id="netIncome" type="number" min="0" step="1000" placeholder="e.g., 220000" />
+            </div>
+            <div>
+              <label for="w2Wages">W-2 wages (owner + staff)</label>
+              <input id="w2Wages" type="number" min="0" step="1000" placeholder="e.g., 120000" />
+            </div>
+            <div>
+              <label for="ownerW2">Owner W-2 wages (if S-Corp)</label>
+              <input id="ownerW2" type="number" min="0" step="1000" placeholder="e.g., 80000" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 18: DEDUCTIONS / DETAILS -->
+        <div class="stepPanel hidden" data-step="18">
+          <div class="form">
+            <div>
+              <label for="retirementContrib">Retirement contributions</label>
+              <input id="retirementContrib" type="number" min="0" step="500" placeholder="e.g., 30000" />
+            </div>
+            <div>
+              <label for="healthPremiums">Health premiums (annual)</label>
+              <input id="healthPremiums" type="number" min="0" step="500" placeholder="e.g., 12000" />
+            </div>
+
+            <div>
+              <label for="filingStatus">Filing status (for better estimates)</label>
+              <select id="filingStatus">
+                <option value="mfj">Married filing jointly</option>
+                <option value="single">Single</option>
+                <option value="hoh">Head of household</option>
+                <option value="mfs">Married filing separately</option>
+              </select>
+            </div>
+            <div>
+              <label for="sstb">Is your business an SSTB? (for 199A)</label>
+              <select id="sstb">
+                <option value="unknown">I don't know</option>
+                <option value="no">No</option>
+                <option value="yes">Yes (e.g., consulting, health, law, accounting, financial services)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="hasKids">Do you have children you could pay for legitimate work?</label>
+              <select id="hasKids">
+                <option value="unknown">I'm not sure</option>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label for="kidsCount"># of eligible kids (approx.)</label>
+              <input id="kidsCount" type="number" min="0" step="1" placeholder="e.g., 1" />
+              <div class="hint">Used for Hiring Your Kids estimates (wages per child).</div>
+            </div>
+
+            <div>
+              <label for="itemize">Do you currently itemize deductions?</label>
+              <select id="itemize">
+                <option value="unknown">I don't know</option>
+                <option value="no">No (standard deduction)</option>
+                <option value="yes">Yes (itemize)</option>
+              </select>
+            </div>
+            <div>
+              <label for="charitableGiving">Charitable giving per year (rough)</label>
+              <input id="charitableGiving" type="number" min="0" step="500" placeholder="e.g., 10000" />
+            </div>
+
+            <div>
+              <label for="mortgageInterest">Mortgage interest (annual)</label>
+              <input id="mortgageInterest" type="number" min="0" step="500" placeholder="e.g., 18000" />
+            </div>
+            <div>
+              <label for="otherItemized">Other itemized deductions (annual)</label>
+              <input id="otherItemized" type="number" min="0" step="500" placeholder="e.g., 3000" />
+            </div>
+
+            <div>
+              <label for="saltLimited">Are you limited by the $10k SALT cap?</label>
+              <select id="saltLimited">
+                <option value="unknown">I don't know</option>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label for="stateTaxPaid">State income tax paid (last year, approx.)</label>
+              <input id="stateTaxPaid" type="number" min="0" step="500" placeholder="e.g., 15000" />
+              <div class="hint">Used for PTET + itemized deduction modeling.</div>
+            </div>
+
+            <div>
+              <label for="annualMiles">Estimated business miles per year</label>
+              <input id="annualMiles" type="number" min="0" step="100" placeholder="e.g., 12000" />
+            </div>
+            <div>
+              <label for="phoneInternetMonthly">Phone + internet (monthly)</label>
+              <input id="phoneInternetMonthly" type="number" min="0" step="10" placeholder="e.g., 180" />
+            </div>
+
+            <div>
+              <label for="homeOfficeSqft">Home office square feet (if any)</label>
+              <input id="homeOfficeSqft" type="number" min="0" step="10" placeholder="e.g., 250" />
+              <div class="hint">Used to model accountable plan / home office reimbursement assumptions.</div>
+            </div>
+            <div>
+              <label for="ownsRental">Do you own rental real estate?</label>
+              <select id="ownsRental">
+                <option value="unknown">I don't know</option>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label for="rentalBasis">Total rental property cost basis (approx.)</label>
+              <input id="rentalBasis" type="number" min="0" step="5000" placeholder="e.g., 600000" />
+            </div>
+
+            <div>
+              <label for="placedInServiceYear">Placed-in-service year (most recent property)</label>
+              <input id="placedInServiceYear" type="number" min="1990" step="1" placeholder="e.g., 2024" />
+            </div>
+            <div>
+              <label for="reProfessional">Real estate professional status (REPS)?</label>
+              <select id="reProfessional">
+                <option value="unknown">I don't know</option>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="materialParticipation">Material participation in rentals?</label>
+              <select id="materialParticipation">
+                <option value="unknown">I don't know</option>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+              <div class="hint">Used to model whether depreciation can offset active income.</div>
+            </div>
+
+            <div class="full">
+              <label for="notes">Notes (optional)</label>
+              <textarea id="notes" placeholder="Any context you want included in exported summary..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 19: RESULTS -->
+        <div class="stepPanel hidden" data-step="19">
+          <div class="kpis">
+            <div class="kpi good">
+              <div class="s">Estimated total savings</div>
+              <div class="v" id="kpiTotal">$0</div>
+            </div>
+            <div class="kpi">
+              <div class="s">Effective savings rate (of net profit)</div>
+              <div class="v" id="kpiRate">0%</div>
+            </div>
+            <div class="kpi">
+              <div class="s"># strategies applied</div>
+              <div class="v" id="kpiCount">0</div>
+            </div>
+            <div class="kpi">
+              <div class="s">Taxable income (rough)</div>
+              <div class="v" id="kpiTaxable">$0</div>
+            </div>
+          </div>
+
+          <!-- CTA below savings estimate -->
+          <div class="ctaCard">
+            <p>This is a conservative estimate. Schedule a free strategy call to see the full picture.</p>
+            <a href="#">Schedule a Free Strategy Call</a>
+          </div>
+
+          <div class="footerNote">
+            <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee. This calculator provides a conservative preview only and is not the final determination of savings.
+          </div>
+
+          <div style="margin-top:14px"></div>
+          <div class="sectionTitle">
+            <h3>Strategy breakdown</h3>
+            <div class="pill">Shown at the end</div>
+          </div>
+          <div class="list" id="strategyList"></div>
+
+          <!-- Results email form -->
+          <div class="resultsEmailCard" id="resultsEmailCard">
+            <h4>Want a copy of your results?</h4>
+            <p>Enter your email and we'll send you a full summary of your tax savings estimate.</p>
+            <form id="resultsEmailForm" class="resultsEmailForm">
+              <div style="flex:1;">
+                <label for="resultsEmail">Email address</label>
+                <input id="resultsEmail" type="email" placeholder="you@example.com" required />
+              </div>
+              <button class="primary" type="submit">Send My Results</button>
+            </form>
+            <div id="emailSuccessMsg" class="emailSuccess hidden">Your results have been sent! Check your inbox.</div>
+          </div>
+
+          <div class="actions" style="margin-top:14px; border-top:0; padding-top:0;">
+            <div class="left" style="justify-content:flex-start;">
+              <button id="btnPdf" class="primary" type="button">Download PDF report</button>
+            </div>
+            <div class="right" style="justify-content:flex-end;"></div>
+          </div>
+
+          <p class="footerNote" style="border-top:0; padding-top:0; margin-top:10px;">
+            Tip: "Download PDF report" opens a print-ready report in a new tab. Choose <span class="mono">Print &rarr; Save as PDF</span>.
+          </p>
+        </div>
+
+        <div class="actions" id="actionsRow">
+          <div class="left"><button id="btnBack" class="ghost" type="button">Back</button></div>
+          <div class="right"><button id="btnNext" class="primary" type="button">Continue</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    "use strict";
+
+    // =========================================================
+    // STRATEGY_RULES (ARK BASIC TAX STRATEGIES — RANGE ESTIMATES)
+    // =========================================================
+
+    const STRATEGY_ASSUMPTIONS = {
+      defaultHighMultiplier: 1.8,
+
+      // Accountable Plan
+      accountablePlanPctOfRevenueLow: 0.005,
+      accountablePlanPctOfRevenueHigh: 0.015,
+
+      // Augusta Rule: $0.75 / sq ft / day x 14 days
+      augustaDays: 14,
+      augustaRatePerSqFt: 0.75,
+
+      // Hiring kids
+      kidsWagesLow: 6000,
+      kidsWagesHigh: 14600,
+      payrollTaxRate: 0.153,
+
+      // 199A
+      qbiDeductionRate: 0.20,
+
+      // PTET
+      saltCap: 10000,
+
+      // Mileage + phone assumptions (Accountable Plan modeling)
+      mileageRate: 0.67,
+      phoneInternetBizUsePct: 0.70,
+      homeOfficeAnnualPerSqFt: 6,
+
+      // Cost seg assumptions
+      costSegReclassLow: 0.22,
+      costSegReclassHigh: 0.35,
+      passiveUsabilityFactor: 0.30,
+    };
+
+    const PASS_THROUGH_ENTITIES = new Set(["sole_prop","partnership","s_corp"]);
+    const PTET_STATES = new Set([
+      "CA","LA","NY","NJ","CT","MA","IL","GA","AZ","CO","WI","MN","SC","NC","OR","RI",
+    ]);
+
+    // Standard deduction placeholders (update annually)
+    const STANDARD_DEDUCTION = {
+      mfj: 29200,
+      single: 14600,
+      hoh: 21900,
+      mfs: 14600,
+    };
+
+    function bonusDepPct(year){
+      if (year >= 2027) return 0.00;
+      if (year === 2026) return 0.20;
+      if (year === 2025) return 0.40;
+      if (year === 2024) return 0.60;
+      if (year === 2023) return 0.80;
+      return 1.00;
+    }
+
+    function range(low, high){
+      const a = clampMoney(low);
+      const b = clampMoney(high);
+      return { low: Math.min(a,b), high: Math.max(a,b) };
+    }
+
+    function rangeAdd(r1, r2){
+      return range((r1?.low||0) + (r2?.low||0), (r1?.high||0) + (r2?.high||0));
+    }
+
+    function rangeFromDeduction(deductionLow, deductionHigh, marginalRate){
+      const r = clamp01(marginalRate);
+      return range(deductionLow * r, deductionHigh * r);
+    }
+
+    function rangeToMoney(r){
+      const rr = r || {low:0, high:0};
+      if (Math.abs(rr.high - rr.low) < 0.01) return money(rr.low);
+      return `${money(rr.low)} \u2013 ${money(rr.high)}`;
+    }
+
+    const STRATEGY_RULES = [
+      {
+        id: "accountable_plan",
+        name: "Accountable Plan",
+        description: "Reimburse personal expenses (home office, phone/internet, mileage) through your business (IRC \u00a762(a)(2)(A)).",
+        compute: (ctx) => {
+          const miles = Math.max(0, ctx.annualMiles || 0);
+          const mileageDed = miles * STRATEGY_ASSUMPTIONS.mileageRate;
+
+          const phoneMonthly = Math.max(0, ctx.phoneInternetMonthly || 0);
+          const phoneDed = (phoneMonthly * 12) * STRATEGY_ASSUMPTIONS.phoneInternetBizUsePct;
+
+          const officeSqft = Math.max(0, ctx.homeOfficeSqft || 0);
+          const officeDed = officeSqft * STRATEGY_ASSUMPTIONS.homeOfficeAnnualPerSqFt;
+
+          const hasBehaviorInputs = (miles > 0 || phoneMonthly > 0 || officeSqft > 0);
+          const fallbackLow = ctx.revenue * STRATEGY_ASSUMPTIONS.accountablePlanPctOfRevenueLow;
+          const fallbackHigh = ctx.revenue * STRATEGY_ASSUMPTIONS.accountablePlanPctOfRevenueHigh;
+
+          const modeled = mileageDed + phoneDed + officeDed;
+          const baseLow = hasBehaviorInputs ? modeled * 0.85 : fallbackLow;
+          const baseHigh = hasBehaviorInputs ? modeled * 1.15 : fallbackHigh;
+
+          const savingsRange = rangeFromDeduction(baseLow, baseHigh, ctx.assumedMarginalRate);
+          return {
+            eligible: ctx.revenue > 0 && ctx.netIncome > 0,
+            savingsRange,
+            details: (hasBehaviorInputs
+              ? `Modeled reimbursable expenses: mileage ${money(mileageDed)} + phone/internet ${money(phoneDed)} + home office ${money(officeDed)} (\u00b115%), taxed at ${pct(ctx.assumedMarginalRate)}.`
+              : `Fallback: reimbursable expenses ~${pct(STRATEGY_ASSUMPTIONS.accountablePlanPctOfRevenueLow)}\u2013${pct(STRATEGY_ASSUMPTIONS.accountablePlanPctOfRevenueHigh)} of revenue, taxed at ${pct(ctx.assumedMarginalRate)}.`),
+            tags: ["Deduction", "Operations"],
+          };
+        },
+      },
+      {
+        id: "augusta_rule",
+        name: "Augusta Rule (14-day rental)",
+        description: "Rent your home to your business up to 14 days; deductible to business, tax-free to you (IRC \u00a7280A(g)).",
+        compute: (ctx) => {
+          if (ctx.q15 !== "yes" || !(ctx.homeSqft > 0)){
+            return { eligible:false, savingsRange: range(0,0), details:"Requires home ownership and square footage.", tags:["Real Estate","Deduction"] };
+          }
+          const rent = ctx.homeSqft * STRATEGY_ASSUMPTIONS.augustaRatePerSqFt * STRATEGY_ASSUMPTIONS.augustaDays;
+          const savingsRange = rangeFromDeduction(rent, rent, ctx.assumedMarginalRate);
+          return {
+            eligible: ctx.netIncome > 0,
+            savingsRange,
+            details: `${ctx.homeSqft.toLocaleString()} sq ft \u00d7 $${STRATEGY_ASSUMPTIONS.augustaRatePerSqFt}/sq ft \u00d7 ${STRATEGY_ASSUMPTIONS.augustaDays} days at ${pct(ctx.assumedMarginalRate)}.`,
+            tags: ["Deduction", "Real Estate"],
+          };
+        },
+      },
+      {
+        id: "hire_kids",
+        name: "Hiring Your Kids",
+        description: "Deduct wages paid to kids; potential payroll-tax advantages under certain structures (IRC \u00a73121(b)(3)(A)).",
+        compute: (ctx) => {
+          const isSCorp = (ctx.taxTreatment === "s_corp");
+          const hasKids = (ctx.hasKids === "yes" && (ctx.kidsCount || 0) > 0);
+          if (!hasKids) {
+            return { eligible:false, savingsRange: range(0,0), details:"Requires eligible children (and count) to estimate.", tags:["Family","Payroll"] };
+          }
+
+          const kidCount = clampInt(ctx.kidsCount || 0, 1, 6);
+          const wagesLow = STRATEGY_ASSUMPTIONS.kidsWagesLow * kidCount;
+          const wagesHigh = STRATEGY_ASSUMPTIONS.kidsWagesHigh * kidCount;
+          const incomeTaxSavings = rangeFromDeduction(wagesLow, wagesHigh, ctx.assumedMarginalRate);
+
+          const payrollSavings = isSCorp
+            ? range(0,0)
+            : range(wagesLow * STRATEGY_ASSUMPTIONS.payrollTaxRate, wagesHigh * STRATEGY_ASSUMPTIONS.payrollTaxRate);
+
+          const savingsRange = rangeAdd(incomeTaxSavings, payrollSavings);
+
+          return {
+            eligible: ctx.netIncome > 0,
+            savingsRange,
+            details: isSCorp
+              ? `S-Corp note: payroll taxes generally apply. Assumes ${kidCount} child(ren) at $${fmt(STRATEGY_ASSUMPTIONS.kidsWagesLow)}\u2013$${fmt(STRATEGY_ASSUMPTIONS.kidsWagesHigh)} each, deducted at ${pct(ctx.assumedMarginalRate)}.`
+              : `Non S-Corp note: may reduce income tax + avoid some payroll taxes. Assumes ${kidCount} child(ren) at $${fmt(STRATEGY_ASSUMPTIONS.kidsWagesLow)}\u2013$${fmt(STRATEGY_ASSUMPTIONS.kidsWagesHigh)} each; payroll tax rate ${pct(STRATEGY_ASSUMPTIONS.payrollTaxRate)}.`,
+            tags: ["Family", "Payroll", isSCorp ? "S-Corp" : "Non S-Corp"],
+          };
+        },
+      },
+      {
+        id: "qbi_199a",
+        name: "199A Deduction (QBI optimization)",
+        description: "Potential 20% deduction on qualified business income for pass-through entities (IRC \u00a7199A).",
+        compute: (ctx) => {
+          const passThrough = PASS_THROUGH_ENTITIES.has(ctx.taxTreatment);
+          if (!passThrough) return { eligible:false, savingsRange: range(0,0), details:"Primarily applies to pass-through entities.", tags:["199A"] };
+
+          const taxableIncome = Math.max(0, ctx.netIncome - ctx.retirementContrib - ctx.healthPremiums);
+          const stdDed = STANDARD_DEDUCTION[ctx.filingStatus] ?? STANDARD_DEDUCTION.mfj;
+
+          const threshold = (ctx.filingStatus === "mfj") ? 383900 : 191950;
+          const phaseRange = (ctx.filingStatus === "mfj") ? 100000 : 50000;
+          const isSSTB = (ctx.sstb === "yes");
+
+          const qbi = Math.max(0, ctx.netIncome);
+          let qbiDed = qbi * 0.20;
+
+          if (taxableIncome > threshold) {
+            const w2 = Math.max(0, ctx.w2Wages || 0);
+            const limit = 0.50 * w2;
+            qbiDed = Math.min(qbiDed, limit);
+          }
+
+          if (isSSTB) {
+            const over = Math.max(0, taxableIncome - threshold);
+            const pctPhase = clamp01(over / phaseRange);
+            qbiDed = qbiDed * (1 - pctPhase);
+          }
+
+          const dedLow = qbiDed * 0.90;
+          const dedHigh = qbiDed * 1.10;
+          const savingsRange = rangeFromDeduction(dedLow, dedHigh, ctx.assumedMarginalRate);
+
+          return {
+            eligible: ctx.netIncome > 0,
+            savingsRange,
+            details: `Modeled QBI deduction using net income, taxable income (net \u2212 retirement \u2212 health), W-2 wages limit (if above threshold), and SSTB phaseout (if applicable). Standard deduction placeholder: ${money(stdDed)}.`,
+            tags: ["199A", "Pass-through"],
+          };
+        },
+      },
+      {
+        id: "ptet",
+        name: "PTET (State Pass-Through Entity Tax Deduction)",
+        description: "Entity-level state tax deduction workaround to SALT cap (IRS Notice 2020-75; state-dependent).",
+        compute: (ctx) => {
+          const passThrough = PASS_THROUGH_ENTITIES.has(ctx.taxTreatment);
+          if (!passThrough) return { eligible:false, savingsRange: range(0,0), details:"Applies to pass-through entities.", tags:["State", "SALT"] };
+          if (!PTET_STATES.has(ctx.state)) return { eligible:false, savingsRange: range(0,0), details:`State ${ctx.state} not in configured PTET list (expand as needed).`, tags:["State", "SALT"] };
+
+          const stTax = Math.max(0, ctx.stateTaxPaid || 0);
+          const saltBinding = (ctx.saltLimited === "yes") || (ctx.saltLimited === "unknown" && stTax > STRATEGY_ASSUMPTIONS.saltCap);
+          const nondeductible = saltBinding ? Math.max(0, stTax - STRATEGY_ASSUMPTIONS.saltCap) : 0;
+
+          const savingsRange = rangeFromDeduction(nondeductible * 0.90, nondeductible * 1.10, ctx.assumedMarginalRate);
+
+          return {
+            eligible: ctx.netIncome > 0,
+            savingsRange,
+            details: `Modeled incremental federal benefit on state tax above SALT cap: nondeductible \u2248 ${money(nondeductible)} (inferred binding: ${saltBinding ? "yes" : "no"}), taxed at ${pct(ctx.assumedMarginalRate)}. Requires state election + CPA coordination.`,
+            tags: ["PTET", "State"],
+          };
+        },
+      },
+      {
+        id: "daf_lumping",
+        name: "Charitable Lumping (DAF Strategy)",
+        description: "Combine multiple years of giving into one high-income year using a Donor-Advised Fund (IRC \u00a7170).",
+        compute: (ctx) => {
+          const giving = Math.max(0, ctx.charitableGiving || 0);
+          if (giving <= 0) return { eligible:false, savingsRange: range(0,0), details:"No charitable giving amount provided.", tags:["Charitable"] };
+
+          const stdDed = STANDARD_DEDUCTION[ctx.filingStatus] ?? STANDARD_DEDUCTION.mfj;
+          const saltDed = Math.min(STRATEGY_ASSUMPTIONS.saltCap, Math.max(0, ctx.stateTaxPaid || 0));
+          const itemBase = Math.max(0, saltDed + (ctx.mortgageInterest || 0) + (ctx.otherItemized || 0) + giving);
+
+          const lumpYears = 3;
+          const lumped = giving * lumpYears;
+          const itemLumped = Math.max(0, saltDed + (ctx.mortgageInterest || 0) + (ctx.otherItemized || 0) + lumped);
+
+          const deltaDed = Math.max(0, itemLumped - Math.max(stdDed, itemBase));
+          const savingsRange = rangeFromDeduction(deltaDed * 0.90, deltaDed * 1.10, ctx.assumedMarginalRate);
+          return {
+            eligible: true,
+            savingsRange,
+            details: `Modeled incremental deduction vs. standard/itemized baseline by lumping ${lumpYears} years of giving into one year. Standard deduction placeholder: ${money(stdDed)}; SALT deductible used: ${money(saltDed)}.`,
+            tags: ["Charitable", "DAF"],
+          };
+        },
+      },
+    ];
+
+    // =========================================================
+    // CORE APP
+    // =========================================================
+    const els = {
+      appWrap: document.getElementById("appWrap"),
+
+      btnPdf: document.getElementById("btnPdf"),
+      stepper: document.getElementById("stepper"),
+      panels: Array.from(document.querySelectorAll(".stepPanel")),
+      actionsRow: document.getElementById("actionsRow"),
+
+      btnBack: document.getElementById("btnBack"),
+      btnNext: document.getElementById("btnNext"),
+      toast: document.getElementById("toast"),
+      statusPill: document.getElementById("statusPill"),
+      strategyList: document.getElementById("strategyList"),
+
+      state: document.getElementById("state"),
+      entityType: document.getElementById("entityType"),
+      industry: document.getElementById("industry"),
+
+      firstName: document.getElementById("firstName"),
+      lastName: document.getElementById("lastName"),
+      businessName: document.getElementById("businessName"),
+      mobilePhone: document.getElementById("mobilePhone"),
+      email: document.getElementById("email"),
+      btnCreateAccount: document.getElementById("btnCreateAccount"),
+
+      homeSqftModal: document.getElementById("homeSqftModal"),
+      homeSqftInput: document.getElementById("homeSqftInput"),
+      btnHomeSqftCancel: document.getElementById("btnHomeSqftCancel"),
+      btnHomeSqftContinue: document.getElementById("btnHomeSqftContinue"),
+
+      q1Buttons: document.querySelectorAll("#yearsInBusiness .choice"),
+      q2Buttons: document.querySelectorAll("#legalEntity .choice"),
+      q3Buttons: document.querySelectorAll("#taxTreatment .choice"),
+      q4Buttons: document.querySelectorAll("#revenueRange .choice"),
+      q5Buttons: document.querySelectorAll("#netIncomeRange .choice"),
+      q6Buttons: document.querySelectorAll("#hasEmployees .choice"),
+      q7Buttons: document.querySelectorAll("#usesHsaHra .choice"),
+      q8Buttons: document.querySelectorAll("#retirementPlan .choice"),
+      q9Buttons: document.querySelectorAll("#cpaMeetings .choice"),
+      q10Buttons: document.querySelectorAll("#hasEstatePlan .choice"),
+      q11Buttons: document.querySelectorAll("#usesTrusts .choice"),
+      q12Buttons: document.querySelectorAll("#tracksMileage .choice"),
+      q13Buttons: document.querySelectorAll("#q12 .choice"),
+      q14Buttons: document.querySelectorAll("#q13 .choice"),
+      q15Buttons: document.querySelectorAll("#q15 .choice"),
+
+      btnGoBackQ1: document.getElementById("btnGoBackQ1"),
+      btnGoBackQ2: document.getElementById("btnGoBackQ2"),
+      btnGoBackQ3: document.getElementById("btnGoBackQ3"),
+      btnGoBackQ4: document.getElementById("btnGoBackQ4"),
+      btnGoBackQ5: document.getElementById("btnGoBackQ5"),
+      btnGoBackQ6: document.getElementById("btnGoBackQ6"),
+      btnGoBackQ7: document.getElementById("btnGoBackQ7"),
+      btnGoBackQ8: document.getElementById("btnGoBackQ8"),
+      btnGoBackQ9: document.getElementById("btnGoBackQ9"),
+      btnGoBackQ10: document.getElementById("btnGoBackQ10"),
+      btnGoBackQ11: document.getElementById("btnGoBackQ11"),
+      btnGoBackQ12: document.getElementById("btnGoBackQ12"),
+      btnGoBackQ13: document.getElementById("btnGoBackQ13"),
+      btnGoBackQ14: document.getElementById("btnGoBackQ14"),
+      btnGoBackQ15: document.getElementById("btnGoBackQ15"),
+
+      revenue: document.getElementById("revenue"),
+      netIncome: document.getElementById("netIncome"),
+      w2Wages: document.getElementById("w2Wages"),
+      ownerW2: document.getElementById("ownerW2"),
+      retirementContrib: document.getElementById("retirementContrib"),
+      healthPremiums: document.getElementById("healthPremiums"),
+      notes: document.getElementById("notes"),
+
+      filingStatus: document.getElementById("filingStatus"),
+      mortgageInterest: document.getElementById("mortgageInterest"),
+      otherItemized: document.getElementById("otherItemized"),
+      annualMiles: document.getElementById("annualMiles"),
+      phoneInternetMonthly: document.getElementById("phoneInternetMonthly"),
+      homeOfficeSqft: document.getElementById("homeOfficeSqft"),
+      rentalBasis: document.getElementById("rentalBasis"),
+      placedInServiceYear: document.getElementById("placedInServiceYear"),
+      reProfessional: document.getElementById("reProfessional"),
+      materialParticipation: document.getElementById("materialParticipation"),
+
+      sstb: document.getElementById("sstb"),
+      hasKids: document.getElementById("hasKids"),
+      kidsCount: document.getElementById("kidsCount"),
+      itemize: document.getElementById("itemize"),
+      charitableGiving: document.getElementById("charitableGiving"),
+      saltLimited: document.getElementById("saltLimited"),
+      stateTaxPaid: document.getElementById("stateTaxPaid"),
+      ownsRental: document.getElementById("ownsRental"),
+
+      kpiTotal: document.getElementById("kpiTotal"),
+      kpiRate: document.getElementById("kpiRate"),
+      kpiCount: document.getElementById("kpiCount"),
+      kpiTaxable: document.getElementById("kpiTaxable"),
+
+      resultsEmailForm: document.getElementById("resultsEmailForm"),
+      resultsEmail: document.getElementById("resultsEmail"),
+      emailSuccessMsg: document.getElementById("emailSuccessMsg"),
+      resultsEmailCard: document.getElementById("resultsEmailCard"),
+    };
+
+    const answers = {
+      yearsInBusiness: "1to5",
+      legalEntity: "llc",
+      taxTreatment: "sole_prop",
+      revenueRange: "500k_to_1m",
+      netIncomeRange: "150k_to_300k",
+      hasEmployees: "no",
+      usesHsaHra: "no",
+      retirementPlan: "none_qualified",
+      cpaMeetings: "once",
+      hasEstatePlan: "no",
+      usesTrusts: "no",
+      tracksMileage: "no",
+      q12: "no",
+      q13: "no",
+      q15: "no",
+      homeSqft: 0,
+    };
+
+    const STEPS = [
+      { title: "State" },
+      { title: "Contact" },
+      { title: "Q1" },
+      { title: "Q2" },
+      { title: "Q3" },
+      { title: "Q4" },
+      { title: "Q5" },
+      { title: "Q6" },
+      { title: "Q7" },
+      { title: "Q8" },
+      { title: "Q9" },
+      { title: "Q10" },
+      { title: "Q11" },
+      { title: "Q12" },
+      { title: "Q13" },
+      { title: "Q14" },
+      { title: "Q15" },
+      { title: "Financials" },
+      { title: "Details" },
+      { title: "Results" },
+    ];
+
+    const STEP_Q15 = 16;
+    const STEP_FINANCIALS = 17;
+    const STEP_DETAILS = 18;
+    const STEP_RESULTS = 19;
+
+    const DEFAULTS = {
+      state: "TX",
+      entityType: "sole_prop",
+      industry: "",
+      firstName: "",
+      lastName: "",
+      businessName: "",
+      mobilePhone: "",
+      email: "",
+      homeSqft: 2400,
+      revenue: 500000,
+      netIncome: 220000,
+      w2Wages: 120000,
+      ownerW2: 80000,
+      retirementContrib: 30000,
+      healthPremiums: 12000,
+      notes: "",
+      filingStatus: "mfj",
+      mortgageInterest: 0,
+      otherItemized: 0,
+      annualMiles: 0,
+      phoneInternetMonthly: 0,
+      homeOfficeSqft: 0,
+      rentalBasis: 0,
+      placedInServiceYear: new Date().getFullYear(),
+      reProfessional: "unknown",
+      materialParticipation: "unknown",
+      sstb: "unknown",
+      hasKids: "unknown",
+      kidsCount: 0,
+      itemize: "unknown",
+      charitableGiving: 0,
+      saltLimited: "unknown",
+      stateTaxPaid: 0,
+      ownsRental: "unknown",
+    };
+
+    let currentStep = 0;
+
+    // Formspree placeholder endpoint — replace with your real endpoint
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
+
+    function populateStates(){
+      const states = [
+        ["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["FL","Florida"],["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],["KS","Kansas"],["KY","Kentucky"],["LA","Louisiana"],["ME","Maine"],["MD","Maryland"],["MA","Massachusetts"],["MI","Michigan"],["MN","Minnesota"],["MS","Mississippi"],["MO","Missouri"],["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","New Hampshire"],["NJ","New Jersey"],["NM","New Mexico"],["NY","New York"],["NC","North Carolina"],["ND","North Dakota"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregon"],["PA","Pennsylvania"],["RI","Rhode Island"],["SC","South Carolina"],["SD","South Dakota"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VA","Virginia"],["WA","Washington"],["WV","West Virginia"],["WI","Wisconsin"],["WY","Wyoming"],
+      ];
+      els.state.innerHTML = states.map(([abbr,name]) => `<option value="${abbr}">${name}</option>`).join("");
+    }
+
+    function syncChoiceSelection(buttons, value){
+      buttons.forEach(b => {
+        const v = b.dataset.value;
+        if (v === value) b.classList.add("selected");
+        else b.classList.remove("selected");
+      });
+    }
+
+    function hydrateDefaults(){
+      els.state.value = DEFAULTS.state;
+      els.entityType.value = DEFAULTS.entityType;
+      els.industry.value = DEFAULTS.industry;
+
+      els.firstName.value = DEFAULTS.firstName;
+      els.lastName.value = DEFAULTS.lastName;
+      els.businessName.value = DEFAULTS.businessName;
+      els.mobilePhone.value = DEFAULTS.mobilePhone;
+      els.email.value = DEFAULTS.email;
+
+      answers.homeSqft = DEFAULTS.homeSqft;
+      if (els.homeSqftInput) els.homeSqftInput.value = DEFAULTS.homeSqft;
+
+      els.revenue.value = DEFAULTS.revenue;
+      els.netIncome.value = DEFAULTS.netIncome;
+      els.w2Wages.value = DEFAULTS.w2Wages;
+      els.ownerW2.value = DEFAULTS.ownerW2;
+      els.retirementContrib.value = DEFAULTS.retirementContrib;
+      els.healthPremiums.value = DEFAULTS.healthPremiums;
+      els.notes.value = DEFAULTS.notes;
+
+      if (els.filingStatus) els.filingStatus.value = DEFAULTS.filingStatus;
+      if (els.mortgageInterest) els.mortgageInterest.value = DEFAULTS.mortgageInterest;
+      if (els.otherItemized) els.otherItemized.value = DEFAULTS.otherItemized;
+      if (els.annualMiles) els.annualMiles.value = DEFAULTS.annualMiles;
+      if (els.phoneInternetMonthly) els.phoneInternetMonthly.value = DEFAULTS.phoneInternetMonthly;
+      if (els.homeOfficeSqft) els.homeOfficeSqft.value = DEFAULTS.homeOfficeSqft;
+      if (els.rentalBasis) els.rentalBasis.value = DEFAULTS.rentalBasis;
+      if (els.placedInServiceYear) els.placedInServiceYear.value = DEFAULTS.placedInServiceYear;
+      if (els.reProfessional) els.reProfessional.value = DEFAULTS.reProfessional;
+      if (els.materialParticipation) els.materialParticipation.value = DEFAULTS.materialParticipation;
+      if (els.sstb) els.sstb.value = DEFAULTS.sstb;
+      if (els.hasKids) els.hasKids.value = DEFAULTS.hasKids;
+      if (els.kidsCount) els.kidsCount.value = DEFAULTS.kidsCount;
+      if (els.itemize) els.itemize.value = DEFAULTS.itemize;
+      if (els.charitableGiving) els.charitableGiving.value = DEFAULTS.charitableGiving;
+      if (els.saltLimited) els.saltLimited.value = DEFAULTS.saltLimited;
+      if (els.stateTaxPaid) els.stateTaxPaid.value = DEFAULTS.stateTaxPaid;
+      if (els.ownsRental) els.ownsRental.value = DEFAULTS.ownsRental;
+
+      syncChoiceSelection(els.q1Buttons, answers.yearsInBusiness);
+      syncChoiceSelection(els.q2Buttons, answers.legalEntity);
+      syncChoiceSelection(els.q3Buttons, answers.taxTreatment);
+      syncChoiceSelection(els.q4Buttons, answers.revenueRange);
+      syncChoiceSelection(els.q5Buttons, answers.netIncomeRange);
+      syncChoiceSelection(els.q6Buttons, answers.hasEmployees);
+      syncChoiceSelection(els.q7Buttons, answers.usesHsaHra);
+      syncChoiceSelection(els.q8Buttons, answers.retirementPlan);
+      syncChoiceSelection(els.q9Buttons, answers.cpaMeetings);
+      syncChoiceSelection(els.q10Buttons, answers.hasEstatePlan);
+      syncChoiceSelection(els.q11Buttons, answers.usesTrusts);
+      syncChoiceSelection(els.q12Buttons, answers.tracksMileage);
+      syncChoiceSelection(els.q13Buttons, answers.q12);
+      syncChoiceSelection(els.q14Buttons, answers.q13);
+      syncChoiceSelection(els.q15Buttons, answers.q15);
+    }
+
+    function renderStepper(){
+      els.stepper.innerHTML = "";
+      STEPS.forEach((s, idx) => {
+        const div = document.createElement("div");
+        div.className = "step" + (idx === currentStep ? " active" : "") + (idx < currentStep ? " done" : "");
+        div.innerHTML = `<span class="dot">${idx+1}</span><span>${s.title}</span>`;
+        els.stepper.appendChild(div);
+      });
+    }
+
+    function applyQuestionProgress(panelEl, qNum, totalQs){
+      const pctNum = Math.round((qNum / totalQs) * 100);
+      const labelEl = panelEl.querySelector(".qLabel");
+      const pctEl = panelEl.querySelector(".qPct");
+      const barEl = panelEl.querySelector(".qBar");
+      if (labelEl) labelEl.textContent = `Question ${qNum} of ${totalQs}`;
+      if (pctEl) pctEl.textContent = `${pctNum}% Complete`;
+      if (barEl) barEl.style.width = `${pctNum}%`;
+    }
+
+    function totalQuestionCount(){ return 15; }
+
+    function showStep(idx){
+      currentStep = clampInt(idx, 0, STEPS.length-1);
+      els.panels.forEach(p => p.classList.add("hidden"));
+      const active = els.panels.find(p => Number(p.dataset.step) === currentStep);
+      if (active) active.classList.remove("hidden");
+
+      const isQuestionStep = !!(active && active.dataset.q);
+      if (isQuestionStep) els.actionsRow.classList.add("hidden");
+      else els.actionsRow.classList.remove("hidden");
+
+      if (active && active.dataset.q) {
+        const qNum = Number(active.dataset.q);
+        applyQuestionProgress(active, qNum, totalQuestionCount());
+      }
+
+      els.btnBack.disabled = currentStep === 0;
+      els.btnNext.textContent = currentStep === STEPS.length-1 ? "Done" : "Continue";
+
+      renderStepper();
+      tick();
+    }
+
+    function num(v){
+      const n = Number(String(v || "").replace(/[^0-9.-]/g, ""));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function clampInt(v, lo, hi){
+      const n = Math.round(Number(v));
+      if (!Number.isFinite(n)) return lo;
+      return Math.min(hi, Math.max(lo, n));
+    }
+
+    function clampMoney(v){
+      const n = Number(v);
+      if (!Number.isFinite(n)) return 0;
+      return Math.max(0, n);
+    }
+
+    function clamp01(v){
+      const n = Number(v);
+      if (!Number.isFinite(n)) return 0;
+      return Math.min(1, Math.max(0, n));
+    }
+
+    function money(v){
+      const n = clampMoney(v);
+      return n.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    }
+
+    function fmt(v){
+      const n = clampMoney(v);
+      return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+
+    function pct(v){
+      const n = Number(v);
+      if (!Number.isFinite(n)) return "0%";
+      return `${Math.round(n * 100)}%`;
+    }
+
+    function escapeHtml(s){
+      const str = String(s);
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function prettyLegalEntity(v){
+      return (
+        v === "llc" ? "LLC" :
+        v === "inc" ? "Inc" :
+        v === "sole_prop" ? "Sole proprietor" :
+        v === "partnership" ? "Partnership" :
+        v === "none" ? "No legal entity" :
+        "\u2014"
+      );
+    }
+
+    function prettyTaxTreatment(v){
+      return (
+        v === "sole_prop" ? "Sole proprietor / Disregarded" :
+        v === "partnership" ? "Partnership" :
+        v === "s_corp" ? "S-Corp" :
+        v === "c_corp" ? "C-Corp" :
+        v === "unknown" ? "Unknown (treated as sole prop)" :
+        "\u2014"
+      );
+    }
+
+    function readInputs(){
+      const ctx = {
+        state: (els.state.value || "").trim(),
+        entityType: els.entityType.value,
+        industry: (els.industry.value || "").trim(),
+
+        firstName: (els.firstName.value || "").trim(),
+        lastName: (els.lastName.value || "").trim(),
+        businessName: (els.businessName.value || "").trim(),
+        mobilePhone: (els.mobilePhone.value || "").trim(),
+        email: (els.email.value || "").trim(),
+
+        yearsInBusiness: answers.yearsInBusiness,
+        legalEntity: answers.legalEntity,
+        taxTreatment: (answers.taxTreatment === "unknown" ? "sole_prop" : answers.taxTreatment),
+        revenueRange: answers.revenueRange,
+        netIncomeRange: answers.netIncomeRange,
+        hasEmployees: answers.hasEmployees,
+        usesHsaHra: answers.usesHsaHra,
+        retirementPlan: answers.retirementPlan,
+        cpaMeetings: answers.cpaMeetings,
+        hasEstatePlan: answers.hasEstatePlan,
+        usesTrusts: answers.usesTrusts,
+        tracksMileage: answers.tracksMileage,
+        q12: answers.q12,
+        q13: answers.q13,
+        q15: answers.q15,
+
+        homeSqft: (answers.q15 === "yes" ? num(answers.homeSqft || (els.homeSqftInput ? els.homeSqftInput.value : 0) || 0) : 0),
+
+        revenue: num(els.revenue.value),
+        netIncome: num(els.netIncome.value),
+        w2Wages: num(els.w2Wages.value),
+        ownerW2: num(els.ownerW2.value),
+        retirementContrib: num(els.retirementContrib.value),
+        healthPremiums: num(els.healthPremiums.value),
+        notes: (els.notes.value || "").trim(),
+
+        filingStatus: (els.filingStatus ? els.filingStatus.value : "mfj"),
+        mortgageInterest: num(els.mortgageInterest ? els.mortgageInterest.value : 0),
+        otherItemized: num(els.otherItemized ? els.otherItemized.value : 0),
+        annualMiles: num(els.annualMiles ? els.annualMiles.value : 0),
+        phoneInternetMonthly: num(els.phoneInternetMonthly ? els.phoneInternetMonthly.value : 0),
+        homeOfficeSqft: num(els.homeOfficeSqft ? els.homeOfficeSqft.value : 0),
+        rentalBasis: num(els.rentalBasis ? els.rentalBasis.value : 0),
+        placedInServiceYear: clampInt(num(els.placedInServiceYear ? els.placedInServiceYear.value : new Date().getFullYear()), 1990, new Date().getFullYear()),
+        reProfessional: (els.reProfessional ? els.reProfessional.value : "unknown"),
+        materialParticipation: (els.materialParticipation ? els.materialParticipation.value : "unknown"),
+        sstb: (els.sstb ? els.sstb.value : "unknown"),
+        hasKids: (els.hasKids ? els.hasKids.value : "unknown"),
+        kidsCount: num(els.kidsCount ? els.kidsCount.value : 0),
+        itemize: (els.itemize ? els.itemize.value : "unknown"),
+        charitableGiving: num(els.charitableGiving ? els.charitableGiving.value : 0),
+        saltLimited: (els.saltLimited ? els.saltLimited.value : "unknown"),
+        stateTaxPaid: num(els.stateTaxPaid ? els.stateTaxPaid.value : 0),
+        ownsRental: (els.ownsRental ? els.ownsRental.value : "unknown"),
+      };
+
+      ctx.assumedMarginalRate = clamp01(
+        ctx.netIncome > 500000 ? 0.37 :
+        ctx.netIncome > 250000 ? 0.32 :
+        ctx.netIncome > 150000 ? 0.24 :
+        ctx.netIncome > 80000  ? 0.22 :
+        0.12
+      );
+
+      return ctx;
+    }
+
+    function validateForStep(ctx, stepIdx){
+      const issues = [];
+      if (stepIdx >= 0 && !ctx.state) issues.push("Please select a state.");
+      if (stepIdx >= 1) {
+        if (!ctx.firstName) issues.push("First name is required.");
+        if (!ctx.lastName) issues.push("Last name is required.");
+        if (!ctx.businessName) issues.push("Business name is required.");
+        if (!ctx.mobilePhone) issues.push("Mobile phone is required.");
+        if (!ctx.email || !ctx.email.includes("@")) issues.push("A valid email is required.");
+      }
+      return issues;
+    }
+
+    function computeResults(ctx){
+      const results = [];
+      for (const rule of STRATEGY_RULES){
+        const out = rule.compute(ctx);
+        if (!out || !out.eligible) continue;
+        results.push({
+          id: rule.id,
+          name: rule.name,
+          description: rule.description,
+          savingsRange: out.savingsRange,
+          details: out.details,
+          tags: out.tags || [],
+        });
+      }
+      results.sort((a,b) => (b.savingsRange?.high||0) - (a.savingsRange?.high||0));
+      return results;
+    }
+
+    function renderResults(ctx){
+      const results = computeResults(ctx);
+      const totalHigh = results.reduce((sum,r) => sum + (r.savingsRange?.high||0), 0);
+      const totalLow  = results.reduce((sum,r) => sum + (r.savingsRange?.low||0), 0);
+
+      const taxable = Math.max(0, ctx.netIncome - ctx.retirementContrib - ctx.healthPremiums);
+      const rate = ctx.netIncome > 0 ? (totalHigh / ctx.netIncome) : 0;
+
+      els.kpiTotal.textContent = `${money(totalLow)} \u2013 ${money(totalHigh)}`;
+      els.kpiRate.textContent = pct(rate);
+      els.kpiCount.textContent = String(results.length);
+      els.kpiTaxable.textContent = money(taxable);
+
+      if (els.btnPdf) {
+        els.btnPdf.onclick = () => {
+          const fresh = readInputs();
+          openReportPrintView(fresh, computeResults(fresh));
+        };
+      }
+
+      els.strategyList.innerHTML = results.map(r => {
+        return `
+          <div class="item">
+            <div class="itemTop">
+              <div>
+                <h4>${escapeHtml(r.name)}</h4>
+                <p class="meta">${escapeHtml(r.description)}</p>
+              </div>
+              <div class="amt">${rangeToMoney(r.savingsRange)}</div>
+            </div>
+            <p class="meta">${escapeHtml(r.details || "")}</p>
+            <div class="mini">${(r.tags||[]).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function tick(){
+      const ctx = readInputs();
+      const required = validateForStep(ctx, currentStep);
+      els.statusPill.textContent = required.length ? "Needs info" : "Ready";
+      els.statusPill.style.borderColor = required.length ? "rgba(245,158,11,.45)" : "rgba(34,197,94,.45)";
+
+      renderStepper();
+      if (currentStep === STEP_RESULTS) renderResults(ctx);
+      els.btnNext.disabled = required.length > 0;
+    }
+
+    function toast(msg){
+      els.toast.textContent = msg;
+      els.toast.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => els.toast.classList.remove("show"), 2600);
+    }
+
+    function goNext(){
+      const ctx = readInputs();
+      const issues = validateForStep(ctx, currentStep);
+      if (issues.length){
+        toast(issues[0]);
+        return;
+      }
+
+      if (currentStep === 0) return showStep(1);
+      if (currentStep === 1) return showStep(2);
+      if (currentStep === STEP_FINANCIALS) return showStep(STEP_DETAILS);
+      if (currentStep === STEP_DETAILS) return showStep(STEP_RESULTS);
+
+      showStep(Math.min(currentStep + 1, STEPS.length - 1));
+    }
+
+    function goBack(){
+      if (currentStep === STEP_FINANCIALS) return showStep(STEP_Q15);
+      if (currentStep === STEP_DETAILS) return showStep(STEP_FINANCIALS);
+      if (currentStep === STEP_RESULTS) return showStep(STEP_DETAILS);
+      showStep(Math.max(0, currentStep - 1));
+    }
+
+    function wireChoiceGroup(buttons, key, afterSelect){
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const v = btn.dataset.value;
+          answers[key] = v;
+          syncChoiceSelection(buttons, v);
+          tick();
+          if (afterSelect) afterSelect(v);
+        });
+      });
+    }
+
+    function openHomeSqftModal(){
+      els.homeSqftModal.classList.add("show");
+      const v = (answers.homeSqft || DEFAULTS.homeSqft || "");
+      els.homeSqftInput.value = v;
+      setTimeout(() => els.homeSqftInput.focus(), 0);
+    }
+
+    function closeHomeSqftModal(){
+      els.homeSqftModal.classList.remove("show");
+    }
+
+    // =========================================================
+    // Report generation (print -> Save as PDF)
+    // =========================================================
+
+    function buildReportHTML(ctx, results){
+      const now = new Date();
+      const dateStr = now.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" });
+      const totalHigh = results.reduce((s,r)=>s+(r.savingsRange?.high||0),0);
+      const totalLow  = results.reduce((s,r)=>s+(r.savingsRange?.low||0),0);
+
+      const kv = (k,v) => `
+        <div class="rpKV">
+          <div class="rpK">${escapeHtml(k)}</div>
+          <div class="rpV">${escapeHtml(v || "\u2014")}</div>
+        </div>`;
+
+      const header = `
+        <div class="rpHeader">
+          <div class="rpBrand">
+            <div class="rpLogo">ARK</div>
+            <div>
+              <div class="rpTitle">ARK Academy \u2014 Tax Planning LITE</div>
+              <div class="rpSub">Conservative preview report \u2022 ${escapeHtml(dateStr)}</div>
+            </div>
+          </div>
+          <div class="rpTotals">
+            <div class="rpTotalLabel">Estimated savings range</div>
+            <div class="rpTotal">${money(totalLow)} \u2013 ${money(totalHigh)}</div>
+          </div>
+        </div>`;
+
+      const clientCard = `
+        <div class="rpCard">
+          <div class="rpH">Client + business</div>
+          ${kv("Name", `${ctx.firstName||""} ${ctx.lastName||""}`.trim())}
+          ${kv("Business", ctx.businessName)}
+          ${kv("Email", ctx.email)}
+          ${kv("Phone", ctx.mobilePhone)}
+          ${kv("State", ctx.state)}
+          ${kv("Legal entity", prettyLegalEntity(ctx.legalEntity))}
+          ${kv("Tax treatment", prettyTaxTreatment(ctx.taxTreatment))}
+        </div>`;
+
+      const finCard = `
+        <div class="rpCard">
+          <div class="rpH">Financial snapshot</div>
+          ${kv("Annual revenue", money(ctx.revenue))}
+          ${kv("Net profit (pre-strategies)", money(ctx.netIncome))}
+          ${kv("W-2 wages (owner + staff)", money(ctx.w2Wages))}
+          ${kv("Owner W-2 wages", money(ctx.ownerW2))}
+          ${kv("Assumed marginal rate", pct(ctx.assumedMarginalRate))}
+          ${(ctx.q15 === "yes") ? kv("Home (Augusta)", `${fmt(ctx.homeSqft)} sq ft`) : ""}
+        </div>`;
+
+      const list = (results.length ? results.map(r => `
+        <div class="rpItem">
+          <div class="rpItemTop">
+            <div>
+              <div class="rpItemName">${escapeHtml(r.name)}</div>
+              <div class="rpItemDesc">${escapeHtml(r.description||"")}</div>
+            </div>
+            <div class="rpItemAmt">${rangeToMoney(r.savingsRange)}</div>
+          </div>
+          <div class="rpItemDetails">${escapeHtml(r.details||"")}</div>
+        </div>`).join("\n")
+      : `<div class="rpP">No strategies met the eligibility rules under the current inputs. (This can also indicate missing financial details.)</div>`);
+
+      const notes = ctx.notes ? `
+        <div class="rpH" style="margin-top:12px;">Notes</div>
+        <div class="rpP">${escapeHtml(ctx.notes)}</div>` : "";
+
+      const foot = `
+        <div class="rpFoot">
+          <strong>Important:</strong> This report is a conservative preview for planning and marketing intake. Actual eligibility and savings require a full advisor review and proper documentation.
+          <br/><br/>
+          <strong>Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
+        </div>`;
+
+      return `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ARK Academy \u2014 Tax Planning LITE Report</title>
+<style>
+  :root{ --primary:#133B54; --secondary:#386FA4; --accent:#A98A5E; --line: rgba(19,59,84,.14); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color: var(--primary); background:#fff; }
+  .rpWrap{ max-width: 920px; margin: 0 auto; padding: 26px 22px 34px; }
+  .rpHeader{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; border-bottom: 2px solid var(--line); padding-bottom: 14px; }
+  .rpBrand{ display:flex; gap:12px; align-items:center; }
+  .rpLogo{ width:44px; height:44px; border-radius: 14px; display:grid; place-items:center; font-weight:900; letter-spacing:.06em; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; }
+  .rpTitle{ font-size: 18px; font-weight: 900; }
+  .rpSub{ font-size: 12px; color: rgba(19,59,84,.70); margin-top: 2px; }
+  .rpTotals{ text-align:right; }
+  .rpTotalLabel{ font-size: 12px; color: rgba(19,59,84,.70); }
+  .rpTotal{ font-size: 22px; font-weight: 900; margin-top: 2px; }
+
+  .rpGrid{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .rpCard{ border:1px solid var(--line); border-radius: 16px; padding: 14px; }
+  .rpH{ font-weight: 900; font-size: 13px; color: rgba(19,59,84,.78); margin-bottom: 10px; letter-spacing:.02em; }
+  .rpKV{ display:flex; justify-content:space-between; gap:12px; padding: 7px 0; border-top:1px solid rgba(19,59,84,.10); }
+  .rpKV:first-of-type{ border-top:0; }
+  .rpK{ font-size: 12px; color: rgba(19,59,84,.70); }
+  .rpV{ font-size: 12px; font-weight: 700; text-align:right; }
+
+  .rpList{ display:flex; flex-direction:column; gap: 10px; }
+  .rpItem{ border:1px solid rgba(19,59,84,.12); border-radius: 14px; padding: 12px; }
+  .rpItemTop{ display:flex; justify-content:space-between; gap: 12px; align-items:flex-start; }
+  .rpItemName{ font-weight: 900; font-size: 13px; }
+  .rpItemDesc{ font-size: 12px; color: rgba(19,59,84,.70); margin-top: 2px; }
+  .rpItemAmt{ font-weight: 900; font-size: 13px; white-space:nowrap; }
+  .rpItemDetails{ font-size: 12px; color: rgba(19,59,84,.70); margin-top: 8px; }
+
+  .rpP{ font-size: 12px; color: rgba(19,59,84,.75); }
+  .rpFoot{ margin-top: 14px; border-top: 2px solid var(--line); padding-top: 12px; font-size: 11.5px; color: rgba(19,59,84,.75); line-height:1.45; }
+
+  @media print{ @page { margin: 14mm; } .rpWrap{ max-width:none; padding:0; } }
+</style>
+</head>
+<body onload="try{window.print()}catch(e){}">
+  <div class="rpWrap">
+    ${header}
+    <div class="rpGrid">${clientCard}${finCard}</div>
+    <div class="rpCard" style="margin-top:14px;">
+      <div class="rpH">Strategy breakdown</div>
+      <div class="rpList">${list}</div>
+      ${notes}
+      ${foot}
+    </div>
+  </div>
+</body>
+</html>`;
+    }
+
+    function openReportPrintView(ctx, results){
+      const html = buildReportHTML(ctx, results);
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const w = window.open(url, "_blank", "noopener,noreferrer");
+      if (!w) {
+        URL.revokeObjectURL(url);
+        return toast("Popup blocked \u2014 allow popups to download the PDF.");
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+
+    function buildResultsSummaryText(ctx, results){
+      const totalHigh = results.reduce((s,r)=>s+(r.savingsRange?.high||0),0);
+      const totalLow  = results.reduce((s,r)=>s+(r.savingsRange?.low||0),0);
+
+      const lines = [];
+      lines.push("ARK Academy \u2014 Tax Planning LITE Results");
+      lines.push("");
+      lines.push(`Client: ${(ctx.firstName||"").trim()} ${(ctx.lastName||"").trim()}`.trim());
+      lines.push(`Business: ${ctx.businessName || ""}`);
+      lines.push(`State: ${ctx.state || ""}`);
+      lines.push(`Email: ${ctx.email || ""}`);
+      lines.push(`Phone: ${ctx.mobilePhone || ""}`);
+      lines.push("");
+      lines.push(`Estimated savings range: ${money(totalLow)} \u2013 ${money(totalHigh)}`);
+      lines.push(`Strategies applied: ${results.length}`);
+      lines.push("");
+      lines.push("Strategy breakdown:");
+      for (const r of results){
+        lines.push(`  - ${r.name}: ${rangeToMoney(r.savingsRange)}`);
+        lines.push(`    ${r.details || ""}`);
+      }
+      lines.push("");
+      lines.push("This is a conservative estimate. Schedule a free strategy call to see the full picture.");
+      lines.push("");
+      lines.push("Our Guarantee: If, after completing a full Ark strategy review, we cannot identify at least $12,000 in legally available tax-saving opportunities, we will refund your fee.");
+      return lines.join("\n");
+    }
+
+    // =========================================================
+    // EMAIL RESULTS VIA FORMSPREE
+    // =========================================================
+
+    function sendResultsEmail(userEmail){
+      const ctx = readInputs();
+      const results = computeResults(ctx);
+      const summary = buildResultsSummaryText(ctx, results);
+
+      const payload = {
+        _replyto: userEmail,
+        email: userEmail,
+        _cc: "academy@arkfinancial.com",
+        _subject: `ARK Tax Planning LITE Results: ${ctx.businessName || ctx.firstName || "Client"}`,
+        message: summary,
+      };
+
+      return fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    // =========================================================
+    // WIRING
+    // =========================================================
+
+    populateStates();
+    hydrateDefaults();
+
+    els.btnBack.addEventListener("click", goBack);
+    els.btnNext.addEventListener("click", goNext);
+
+    els.btnCreateAccount.addEventListener("click", () => {
+      const ctx = readInputs();
+      const issues = validateForStep(ctx, 1);
+      if (issues.length) return toast(issues[0]);
+      showStep(2);
+    });
+
+    // Results email form
+    els.resultsEmailForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const emailVal = (els.resultsEmail.value || "").trim();
+      if (!emailVal || !emailVal.includes("@")) {
+        toast("Please enter a valid email address.");
+        return;
+      }
+
+      const submitBtn = els.resultsEmailForm.querySelector("button[type=submit]");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+
+      sendResultsEmail(emailVal)
+        .then(resp => {
+          if (resp.ok) {
+            els.emailSuccessMsg.classList.remove("hidden");
+            els.resultsEmailForm.classList.add("hidden");
+          } else {
+            toast("Could not send email. Please try again.");
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Send My Results";
+          }
+        })
+        .catch(() => {
+          toast("Could not send email. Please try again.");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Send My Results";
+        });
+    });
+
+    wireChoiceGroup(els.q1Buttons, "yearsInBusiness", () => showStep(3));
+    wireChoiceGroup(els.q2Buttons, "legalEntity", () => showStep(4));
+    wireChoiceGroup(els.q3Buttons, "taxTreatment", () => showStep(5));
+    wireChoiceGroup(els.q4Buttons, "revenueRange", () => showStep(6));
+    wireChoiceGroup(els.q5Buttons, "netIncomeRange", () => showStep(7));
+    wireChoiceGroup(els.q6Buttons, "hasEmployees", () => showStep(8));
+    wireChoiceGroup(els.q7Buttons, "usesHsaHra", () => showStep(9));
+    wireChoiceGroup(els.q8Buttons, "retirementPlan", () => showStep(10));
+    wireChoiceGroup(els.q9Buttons, "cpaMeetings", () => showStep(11));
+    wireChoiceGroup(els.q10Buttons, "hasEstatePlan", () => showStep(12));
+    wireChoiceGroup(els.q11Buttons, "usesTrusts", () => showStep(13));
+    wireChoiceGroup(els.q12Buttons, "tracksMileage", () => showStep(14));
+    wireChoiceGroup(els.q13Buttons, "q12", () => showStep(15));
+    wireChoiceGroup(els.q14Buttons, "q13", () => showStep(STEP_Q15));
+
+    wireChoiceGroup(els.q15Buttons, "q15", (v) => {
+      if (v === "yes") {
+        openHomeSqftModal();
+      } else {
+        answers.homeSqft = 0;
+        showStep(STEP_FINANCIALS);
+      }
+    });
+
+    els.btnGoBackQ1.addEventListener("click", () => showStep(1));
+    els.btnGoBackQ2.addEventListener("click", () => showStep(2));
+    els.btnGoBackQ3.addEventListener("click", () => showStep(3));
+    els.btnGoBackQ4.addEventListener("click", () => showStep(4));
+    els.btnGoBackQ5.addEventListener("click", () => showStep(5));
+    els.btnGoBackQ6.addEventListener("click", () => showStep(6));
+    els.btnGoBackQ7.addEventListener("click", () => showStep(7));
+    els.btnGoBackQ8.addEventListener("click", () => showStep(8));
+    els.btnGoBackQ9.addEventListener("click", () => showStep(9));
+    els.btnGoBackQ10.addEventListener("click", () => showStep(10));
+    els.btnGoBackQ11.addEventListener("click", () => showStep(11));
+    els.btnGoBackQ12.addEventListener("click", () => showStep(12));
+    els.btnGoBackQ13.addEventListener("click", () => showStep(13));
+    els.btnGoBackQ14.addEventListener("click", () => showStep(14));
+    els.btnGoBackQ15.addEventListener("click", () => showStep(15));
+
+    els.btnHomeSqftCancel.addEventListener("click", () => {
+      answers.q15 = "no";
+      answers.homeSqft = 0;
+      syncChoiceSelection(els.q15Buttons, "no");
+      closeHomeSqftModal();
+      tick();
+    });
+
+    els.btnHomeSqftContinue.addEventListener("click", () => {
+      const sqft = clampInt(num(els.homeSqftInput.value), 200, 20000);
+      answers.homeSqft = sqft;
+      closeHomeSqftModal();
+      showStep(STEP_FINANCIALS);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && els.homeSqftModal.classList.contains("show")) {
+        els.btnHomeSqftCancel.click();
+      }
+    });
+
+    [
+      els.state, els.entityType, els.industry,
+      els.firstName, els.lastName, els.businessName, els.mobilePhone, els.email,
+      els.revenue, els.netIncome, els.w2Wages, els.ownerW2,
+      els.retirementContrib, els.healthPremiums,
+      els.filingStatus, els.mortgageInterest, els.otherItemized,
+      els.annualMiles, els.phoneInternetMonthly, els.homeOfficeSqft,
+      els.rentalBasis, els.placedInServiceYear,
+      els.reProfessional, els.materialParticipation,
+      els.sstb, els.hasKids, els.kidsCount, els.itemize,
+      els.charitableGiving, els.saltLimited, els.stateTaxPaid, els.ownsRental,
+      els.notes,
+    ].filter(Boolean).forEach(el => {
+      el.addEventListener("input", tick);
+      el.addEventListener("change", tick);
+    });
+
+    // Global guardrails
+    window.addEventListener("error", (e) => {
+      try {
+        const msg = (e && e.message) ? e.message : "Unexpected error";
+        toast(`Error: ${msg} \u2014 refresh the page.`);
+        console.error("Global error:", e);
+      } catch(_) {}
+    });
+
+    window.addEventListener("unhandledrejection", (e) => {
+      try {
+        toast("Error: unhandled promise rejection \u2014 refresh the page.");
+        console.error("Unhandled rejection:", e);
+      } catch(_) {}
+    });
+
+    // Initial render — no auth gate, open access
+    showStep(0);
+  </script>
+</body>
+</html>
