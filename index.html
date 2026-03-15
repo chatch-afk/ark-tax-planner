@@ -1394,8 +1394,7 @@
 
     let currentStep = 0;
 
-    // Formspree placeholder endpoint — replace with your real endpoint
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/myknpdwv";
+    const EDGE_FUNCTION_URL = "https://vfoakreahkuwsbminvfo.supabase.co/functions/v1/send-tax-report";
 
     function populateStates(){
       const states = [
@@ -1968,23 +1967,50 @@
     }
 
     // =========================================================
-    // EMAIL RESULTS VIA FORMSPREE
+    // EMAIL RESULTS VIA SUPABASE EDGE FUNCTION + RESEND
     // =========================================================
 
     function sendResultsToAcademy(){
       const ctx = readInputs();
       const results = computeResults(ctx);
-      const summary = buildResultsSummaryText(ctx, results);
+
+      const totalLow = results.reduce((s,r) => s + (r.savingsRange?.low || 0), 0);
+      const totalHigh = results.reduce((s,r) => s + (r.savingsRange?.high || 0), 0);
 
       const payload = {
-        email: "academy@arkfinancial.com",
-        _subject: `ARK Tax Planning LITE Results: ${ctx.businessName || ctx.firstName || "Client"}`,
-        message: summary,
+        client: {
+          firstName: ctx.firstName,
+          lastName: ctx.lastName,
+          businessName: ctx.businessName,
+          email: ctx.email,
+          phone: ctx.mobilePhone,
+          state: ctx.state,
+          legalEntity: ctx.legalEntity,
+          taxTreatment: ctx.taxTreatment,
+        },
+        financials: {
+          revenue: ctx.revenue,
+          netIncome: ctx.netIncome,
+          w2Wages: ctx.w2Wages,
+          ownerW2: ctx.ownerW2,
+          marginalRate: ctx.assumedMarginalRate,
+        },
+        strategies: results.map(r => ({
+          name: r.name,
+          description: r.description,
+          savingsRange: r.savingsRange,
+          details: r.details,
+          consultationOnly: r.consultationOnly,
+        })),
+        totalSavingsLow: totalLow,
+        totalSavingsHigh: totalHigh,
+        strategyCount: results.length,
+        notes: ctx.notes || "",
       };
 
-      fetch(FORMSPREE_ENDPOINT, {
+      fetch(EDGE_FUNCTION_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }).catch(() => {/* silent — internal notification only */});
     }
