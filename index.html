@@ -1619,11 +1619,11 @@
       els.btnBack.disabled = currentStep === 0;
       els.btnNext.textContent = currentStep === STEPS.length-1 ? "Done" : "Continue";
 
-      // Update global progress bar
-      const totalSteps = STEPS.length;
+      // Update global progress bar (20 steps, Results not counted)
+      const displayTotal = STEPS.length - 1; // 20
       const stepNum = currentStep + 1;
-      const pct = currentStep === STEP_RESULTS ? 100 : Math.round((currentStep / (totalSteps - 1)) * 100);
-      document.getElementById("globalProgressText").textContent = `Step ${stepNum} of ${totalSteps}`;
+      const pct = currentStep === STEP_RESULTS ? 100 : Math.round((currentStep / displayTotal) * 100);
+      document.getElementById("globalProgressText").textContent = `Step ${Math.min(stepNum, displayTotal)} of ${displayTotal}`;
       document.getElementById("globalProgressFill").style.width = pct + "%";
 
       // Hide progress on results
