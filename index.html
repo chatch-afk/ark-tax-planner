@@ -243,6 +243,77 @@
       color: var(--muted);
       line-height: 1.5;
     }
+
+    /* Email gate on results */
+    .savingsTeaser{
+      font-size: 32px; font-weight: 900; color: var(--accent);
+      margin: 8px 0 4px; letter-spacing: -0.02em;
+    }
+    .savingsTeaserSub{
+      font-size: 14px; color: var(--muted); margin: 0 0 20px;
+    }
+    .emailGateForm{
+      display: flex; gap: 10px; max-width: 440px; margin: 0 auto;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .emailGateForm input{
+      flex: 1; min-width: 200px; padding: 12px 14px;
+      border: 1px solid rgba(19,59,84,.18); border-radius: 10px;
+      font-size: 14px; font-family: var(--sans);
+    }
+    .emailGateForm button{
+      background: var(--accent); color: #fff; border: none;
+      padding: 12px 24px; border-radius: 10px; font-weight: 700;
+      font-size: 14px; cursor: pointer; font-family: var(--sans);
+    }
+    .emailGateForm button:hover{ filter: brightness(1.08); }
+    .strategyBreakdown{ margin-top: 28px; text-align: left; }
+    .strategyBreakdown.hidden{ display: none; }
+
+    /* Strategy result cards */
+    .stratCard{
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius2); padding: 16px; margin-bottom: 12px;
+    }
+    .stratCard h4{ margin: 0 0 4px; font-size: 15px; color: var(--primary); }
+    .stratCard .stratSavings{ font-weight: 800; color: var(--accent); font-size: 15px; }
+    .stratCard .stratDesc{ font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .stratCard .stratNote{ font-size: 12px; color: var(--warn); margin-top: 6px; font-style: italic; }
+    .stratCard.consultation .stratSavings{ color: var(--accent); }
+
+    .cpaSectionTitle{
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+      font-weight: 700; color: var(--accent); margin: 24px 0 12px; padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    /* Global progress bar */
+    .globalProgress{
+      padding: 0 4px; margin-top: 8px;
+    }
+    .globalProgressText{
+      font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 6px;
+    }
+    .globalProgressBar{
+      height: 4px; border-radius: 999px; background: rgba(169,138,94,.18); overflow: hidden;
+    }
+    .globalProgressBar > span{
+      display: block; height: 100%; width: 0%;
+      background: var(--accent); border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    /* Resume banner */
+    .resumeBanner{
+      background: rgba(169,138,94,.08); border: 1px solid rgba(169,138,94,.30);
+      border-radius: var(--radius2); padding: 16px; margin-bottom: 16px;
+      text-align: center;
+    }
+    .resumeBanner p{ margin: 0 0 12px; font-size: 14px; color: var(--primary); font-weight: 600; }
+    .resumeBanner .btnGroup{ display: flex; gap: 10px; justify-content: center; }
+    .resumeBanner button{ padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: var(--sans); }
+    .resumeBanner .btnResume{ background: var(--accent); color: #fff; border: none; }
+    .resumeBanner .btnStartOver{ background: transparent; color: var(--muted); border: 1px solid var(--line); }
   </style>
 </head>
 
@@ -275,7 +346,20 @@
           <div class="pill" id="statusPill">Ready</div>
         </div>
 
+        <div id="resumeBanner" class="resumeBanner hidden">
+          <p id="resumeText">Welcome back — you left off at Step 3. Continue where you left off?</p>
+          <div class="btnGroup">
+            <button class="btnResume" id="btnResume" type="button">Continue</button>
+            <button class="btnStartOver" id="btnStartOver" type="button">Start Over</button>
+          </div>
+        </div>
+
         <div class="stepper" id="stepper"></div>
+
+        <div class="globalProgress" id="globalProgress">
+          <div class="globalProgressText" id="globalProgressText">Step 1 of 20</div>
+          <div class="globalProgressBar"><span id="globalProgressFill"></span></div>
+        </div>
 
         <!-- STEP 0: CONTACT INFO -->
         <div class="stepPanel" data-step="0">
@@ -805,14 +889,30 @@
           </div>
         </div>
 
-        <!-- STEP 20: RESULTS -->
+        <!-- STEP 20: RESULTS (email-gated) -->
         <div class="stepPanel hidden" data-step="20">
           <div class="thankYouCard">
             <div class="thankYouIcon">&#10003;</div>
-            <h2>Thank You!</h2>
-            <p>Your information has been submitted successfully. A member of the Ark Academy team will be reaching out to review your results and schedule a strategy call.</p>
-            <div class="thankYouGuarantee">
-              <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
+            <h2>Your Results Are Ready</h2>
+            <div class="savingsTeaser" id="savingsTeaser">$0 – $0</div>
+            <div class="savingsTeaserSub">Estimated annual tax savings</div>
+
+            <div id="emailGate">
+              <p style="font-size:14px; color:var(--muted); margin:0 0 16px;">Enter your email to unlock your full strategy breakdown.</p>
+              <form class="emailGateForm" id="emailGateForm">
+                <input type="email" id="gateEmail" placeholder="you@example.com" required />
+                <button type="submit">Show My Results</button>
+              </form>
+            </div>
+
+            <div class="strategyBreakdown hidden" id="strategyBreakdown">
+              <div id="strategyCards"></div>
+              <div id="consultationSection"></div>
+
+              <div class="thankYouGuarantee" style="margin-top:24px;">
+                <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
+              </div>
+              <p style="font-size:14px; color:var(--muted); margin-top:20px; text-align:center;">A member of the Ark Academy team will be reaching out to review your results and schedule a strategy call.</p>
             </div>
           </div>
         </div>
@@ -1519,6 +1619,23 @@
       els.btnBack.disabled = currentStep === 0;
       els.btnNext.textContent = currentStep === STEPS.length-1 ? "Done" : "Continue";
 
+      // Update global progress bar
+      const totalSteps = STEPS.length;
+      const stepNum = currentStep + 1;
+      const pct = currentStep === STEP_RESULTS ? 100 : Math.round((currentStep / (totalSteps - 1)) * 100);
+      document.getElementById("globalProgressText").textContent = `Step ${stepNum} of ${totalSteps}`;
+      document.getElementById("globalProgressFill").style.width = pct + "%";
+
+      // Hide progress on results
+      document.getElementById("globalProgress").style.display = currentStep === STEP_RESULTS ? "none" : "";
+
+      // Save progress to localStorage (clear on results)
+      if (currentStep === STEP_RESULTS) {
+        localStorage.removeItem("ark-tps-progress");
+      } else {
+        saveProgress();
+      }
+
       renderStepper();
       tick();
     }
@@ -1706,12 +1823,63 @@
     }
 
     let resultsSent = false;
+    let resultsData = null;
+
     function renderResults(ctx){
-      if (!resultsSent) {
-        resultsSent = true;
-        sendResultsToAcademy();
+      const results = computeResults(ctx);
+      resultsData = results;
+
+      const totalLow = results.reduce((s,r) => s + (r.savingsRange?.low || 0), 0);
+      const totalHigh = results.reduce((s,r) => s + (r.savingsRange?.high || 0), 0);
+
+      // Always show the teaser
+      document.getElementById("savingsTeaser").textContent = `${money(totalLow)} – ${money(totalHigh)}`;
+
+      // Check if already unlocked this session
+      if (sessionStorage.getItem("ark-tps-unlocked")) {
+        showFullBreakdown(results);
+        if (!resultsSent) { resultsSent = true; sendResultsToAcademy(); }
       }
     }
+
+    function showFullBreakdown(results){
+      document.getElementById("emailGate").style.display = "none";
+      const breakdown = document.getElementById("strategyBreakdown");
+      breakdown.classList.remove("hidden");
+
+      const estimated = results.filter(r => !r.consultationOnly);
+      const consultation = results.filter(r => r.consultationOnly);
+
+      let cardsHTML = "";
+      if (estimated.length > 0) {
+        cardsHTML += '<div class="cpaSectionTitle">Strategy Breakdown</div>';
+        for (const s of estimated) {
+          const range = s.savingsRange ? `${money(s.savingsRange.low)} – ${money(s.savingsRange.high)}` : "—";
+          cardsHTML += `<div class="stratCard">
+            <h4>${esc(s.name)}</h4>
+            <div class="stratSavings">${range}</div>
+            ${s.description ? `<div class="stratDesc">${esc(s.description)}</div>` : ""}
+            ${s.details ? `<div class="stratNote">${esc(s.details)}</div>` : ""}
+          </div>`;
+        }
+      }
+      document.getElementById("strategyCards").innerHTML = cardsHTML;
+
+      let consultHTML = "";
+      if (consultation.length > 0) {
+        consultHTML += '<div class="cpaSectionTitle">Strategies Requiring CPA Review</div>';
+        for (const s of consultation) {
+          consultHTML += `<div class="stratCard consultation">
+            <h4>${esc(s.name)}</h4>
+            <div class="stratSavings">Consultation Recommended</div>
+            ${s.details ? `<div class="stratDesc">${esc(s.details)}</div>` : ""}
+          </div>`;
+        }
+      }
+      document.getElementById("consultationSection").innerHTML = consultHTML;
+    }
+
+    function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
     function tick(){
       const ctx = readInputs();
@@ -2149,8 +2317,117 @@
       } catch(_) {}
     });
 
-    // Initial render — no auth gate, open access
-    showStep(0);
+    // =========================================================
+    // FIX 1: EMAIL GATE ON RESULTS
+    // =========================================================
+    document.getElementById("emailGateForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("gateEmail").value.trim();
+      if (!email) return;
+      sessionStorage.setItem("ark-tps-unlocked", "1");
+      if (resultsData) {
+        showFullBreakdown(resultsData);
+        if (!resultsSent) { resultsSent = true; sendResultsToAcademy(); }
+      }
+    });
+
+    // =========================================================
+    // FIX 3: SAVE AND RESUME
+    // =========================================================
+    function saveProgress(){
+      try {
+        const data = {
+          step: currentStep,
+          answers: { ...answers },
+          fields: {},
+        };
+        const fieldEls = [
+          "state","entityType","industry","firstName","lastName","businessName",
+          "mobilePhone","email","revenue","netIncome","w2Wages","ownerW2",
+          "retirementContrib","healthPremiums","filingStatus","mortgageInterest",
+          "otherItemized","annualMiles","phoneInternetMonthly","homeOfficeSqft",
+          "rentalBasis","placedInServiceYear","reProfessional","materialParticipation",
+          "sstb","hasKids","kidsCount","itemize","charitableGiving","saltLimited",
+          "stateTaxPaid","ownsRental","notes","numEntities","commonOwnership",
+          "annualHomeExpenses","bizPhoneInternetPct","purchasedEquipment","equipmentCost",
+          "equipmentPlacedInService","hasUnrealizedLosses","unrealizedLossAmount",
+        ];
+        for (const k of fieldEls) {
+          if (els[k] && els[k].value !== undefined) data.fields[k] = els[k].value;
+        }
+        localStorage.setItem("ark-tps-progress", JSON.stringify(data));
+      } catch(e) { /* silent */ }
+    }
+
+    function loadProgress(){
+      try {
+        const raw = localStorage.getItem("ark-tps-progress");
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch(e) { return null; }
+    }
+
+    function restoreProgress(saved){
+      // Restore field values
+      if (saved.fields) {
+        for (const [k, v] of Object.entries(saved.fields)) {
+          if (els[k] && els[k].value !== undefined) els[k].value = v;
+        }
+      }
+      // Restore choice answers
+      if (saved.answers) {
+        Object.assign(answers, saved.answers);
+      }
+      // Sync choice button selections
+      const choiceMap = {
+        yearsInBusiness: els.q1Buttons,
+        legalEntity: els.q2Buttons,
+        taxTreatment: els.q3Buttons,
+        revenueRange: els.q4Buttons,
+        netIncomeRange: els.q5Buttons,
+        hasEmployees: els.q6Buttons,
+        usesHsaHra: els.q7Buttons,
+        retirementPlan: els.q8Buttons,
+        cpaMeetings: els.q9Buttons,
+        hasEstatePlan: els.q10Buttons,
+        usesTrusts: els.q11Buttons,
+        tracksMileage: els.q12Buttons,
+        q12: els.q13Buttons,
+        q13: els.q14Buttons,
+        q15: els.q15Buttons,
+      };
+      for (const [key, btns] of Object.entries(choiceMap)) {
+        if (answers[key] && btns) syncChoiceSelection(btns, answers[key]);
+      }
+      updateAdditionalVisibility();
+      showStep(saved.step);
+    }
+
+    // Check for saved progress on load
+    const savedProgress = loadProgress();
+    if (savedProgress && savedProgress.step > 0) {
+      const banner = document.getElementById("resumeBanner");
+      const resumeText = document.getElementById("resumeText");
+      resumeText.textContent = `Welcome back — you left off at Step ${savedProgress.step + 1}. Continue where you left off?`;
+      banner.classList.remove("hidden");
+
+      document.getElementById("btnResume").addEventListener("click", () => {
+        banner.classList.add("hidden");
+        restoreProgress(savedProgress);
+      });
+
+      document.getElementById("btnStartOver").addEventListener("click", () => {
+        banner.classList.add("hidden");
+        localStorage.removeItem("ark-tps-progress");
+        showStep(0);
+      });
+
+      // Show step 0 in background while banner is visible
+      showStep(0);
+    } else {
+      // Initial render — no auth gate, open access
+      showStep(0);
+    }
   </script>
 </body>
 </html>
