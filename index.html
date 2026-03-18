@@ -889,30 +889,14 @@
           </div>
         </div>
 
-        <!-- STEP 20: RESULTS (email-gated) -->
+        <!-- STEP 20: THANK YOU -->
         <div class="stepPanel hidden" data-step="20">
           <div class="thankYouCard">
             <div class="thankYouIcon">&#10003;</div>
-            <h2>Your Results Are Ready</h2>
-            <div class="savingsTeaser" id="savingsTeaser">$0 – $0</div>
-            <div class="savingsTeaserSub">Estimated annual tax savings</div>
-
-            <div id="emailGate">
-              <p style="font-size:14px; color:var(--muted); margin:0 0 16px;">Enter your email to unlock your full strategy breakdown.</p>
-              <form class="emailGateForm" id="emailGateForm">
-                <input type="email" id="gateEmail" placeholder="you@example.com" required />
-                <button type="submit">Show My Results</button>
-              </form>
-            </div>
-
-            <div class="strategyBreakdown hidden" id="strategyBreakdown">
-              <div id="strategyCards"></div>
-              <div id="consultationSection"></div>
-
-              <div class="thankYouGuarantee" style="margin-top:24px;">
-                <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
-              </div>
-              <p style="font-size:14px; color:var(--muted); margin-top:20px; text-align:center;">A member of the Ark Academy team will be reaching out to review your results and schedule a strategy call.</p>
+            <h2>Thank You!</h2>
+            <p>Your information has been submitted successfully. A member of the Ark Academy team will be reaching out shortly to review your results and discuss your personalized tax strategy.</p>
+            <div class="thankYouGuarantee">
+              <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
             </div>
           </div>
         </div>
@@ -1823,63 +1807,13 @@
     }
 
     let resultsSent = false;
-    let resultsData = null;
 
     function renderResults(ctx){
-      const results = computeResults(ctx);
-      resultsData = results;
-
-      const totalLow = results.reduce((s,r) => s + (r.savingsRange?.low || 0), 0);
-      const totalHigh = results.reduce((s,r) => s + (r.savingsRange?.high || 0), 0);
-
-      // Always show the teaser
-      document.getElementById("savingsTeaser").textContent = `${money(totalLow)} – ${money(totalHigh)}`;
-
-      // Check if already unlocked this session
-      if (sessionStorage.getItem("ark-tps-unlocked")) {
-        showFullBreakdown(results);
-        if (!resultsSent) { resultsSent = true; sendResultsToAcademy(); }
+      if (!resultsSent) {
+        resultsSent = true;
+        sendResultsToAcademy();
       }
     }
-
-    function showFullBreakdown(results){
-      document.getElementById("emailGate").style.display = "none";
-      const breakdown = document.getElementById("strategyBreakdown");
-      breakdown.classList.remove("hidden");
-
-      const estimated = results.filter(r => !r.consultationOnly);
-      const consultation = results.filter(r => r.consultationOnly);
-
-      let cardsHTML = "";
-      if (estimated.length > 0) {
-        cardsHTML += '<div class="cpaSectionTitle">Strategy Breakdown</div>';
-        for (const s of estimated) {
-          const range = s.savingsRange ? `${money(s.savingsRange.low)} – ${money(s.savingsRange.high)}` : "—";
-          cardsHTML += `<div class="stratCard">
-            <h4>${esc(s.name)}</h4>
-            <div class="stratSavings">${range}</div>
-            ${s.description ? `<div class="stratDesc">${esc(s.description)}</div>` : ""}
-            ${s.details ? `<div class="stratNote">${esc(s.details)}</div>` : ""}
-          </div>`;
-        }
-      }
-      document.getElementById("strategyCards").innerHTML = cardsHTML;
-
-      let consultHTML = "";
-      if (consultation.length > 0) {
-        consultHTML += '<div class="cpaSectionTitle">Strategies Requiring CPA Review</div>';
-        for (const s of consultation) {
-          consultHTML += `<div class="stratCard consultation">
-            <h4>${esc(s.name)}</h4>
-            <div class="stratSavings">Consultation Recommended</div>
-            ${s.details ? `<div class="stratDesc">${esc(s.details)}</div>` : ""}
-          </div>`;
-        }
-      }
-      document.getElementById("consultationSection").innerHTML = consultHTML;
-    }
-
-    function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
     function tick(){
       const ctx = readInputs();
@@ -2317,19 +2251,7 @@
       } catch(_) {}
     });
 
-    // =========================================================
-    // FIX 1: EMAIL GATE ON RESULTS
-    // =========================================================
-    document.getElementById("emailGateForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("gateEmail").value.trim();
-      if (!email) return;
-      sessionStorage.setItem("ark-tps-unlocked", "1");
-      if (resultsData) {
-        showFullBreakdown(resultsData);
-        if (!resultsSent) { resultsSent = true; sendResultsToAcademy(); }
-      }
-    });
+    // Email gate removed — results are proprietary, shown only in advisor report
 
     // =========================================================
     // FIX 3: SAVE AND RESUME
