@@ -2108,6 +2108,7 @@
         totalSavingsHigh: totalHigh,
         strategyCount: results.length,
         notes: ctx.notes || "",
+        inputs: ctx,
       };
 
       fetch(EDGE_FUNCTION_URL, {
