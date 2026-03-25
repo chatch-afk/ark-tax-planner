@@ -187,7 +187,7 @@ function buildEmailHTML(data: TaxReportPayload): string {
               <strong>Important:</strong> This report is a conservative preview for planning purposes. Actual eligibility and savings require a full advisor review and proper documentation.
             </p>
             <p style="font-size:12px; color:#6b7b8a; line-height:1.5; margin:12px 0 0;">
-              <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
+              <strong>To explore these strategies further or schedule a full advisor review, contact us at <strong>academy@arkfinancial.com</strong>.
             </p>
           </td>
         </tr>
