@@ -945,10 +945,13 @@
       augustaDays: 14,
       augustaRatePerSqFt: 0.75,
 
-      // Hiring kids
+      // Hiring kids (high = single standard deduction, 2025)
       kidsWagesLow: 6000,
-      kidsWagesHigh: 14600,
+      kidsWagesHigh: 15750,
       payrollTaxRate: 0.153,
+
+      // Social Security wage base (2025)
+      ssWageBase: 176100,
 
       // 199A
       qbiDeductionRate: 0.20,
@@ -957,7 +960,7 @@
       saltCap: 10000,
 
       // Mileage + phone assumptions (Accountable Plan modeling)
-      mileageRate: 0.67,
+      mileageRate: 0.70,
       phoneInternetBizUsePct: 0.70,
       homeOfficeAnnualPerSqFt: 6,
 
@@ -969,23 +972,22 @@
 
     const PASS_THROUGH_ENTITIES = new Set(["sole_prop","partnership","s_corp"]);
     const PTET_STATES = new Set([
-      "CA","LA","NY","NJ","CT","MA","IL","GA","AZ","CO","WI","MN","SC","NC","OR","RI",
+      "AL","AR","AZ","CA","CO","CT","GA","ID","IL","IN","KS","KY","LA","MA","MD",
+      "MI","MN","MO","MS","NC","NE","NJ","NM","NY","OH","OK","OR","RI","SC","UT",
+      "VA","WI","WV",
     ]);
 
-    // Standard deduction placeholders (update annually)
+    // Standard deduction (2025, per OBBBA)
     const STANDARD_DEDUCTION = {
-      mfj: 29200,
-      single: 14600,
-      hoh: 21900,
-      mfs: 14600,
+      mfj: 31500,
+      single: 15750,
+      hoh: 23625,
+      mfs: 15750,
     };
 
+    // OBBBA permanently restored 100% bonus depreciation for property
+    // acquired and placed in service after Jan 19, 2025
     function bonusDepPct(year){
-      if (year >= 2027) return 0.00;
-      if (year === 2026) return 0.20;
-      if (year === 2025) return 0.40;
-      if (year === 2024) return 0.60;
-      if (year === 2023) return 0.80;
       return 1.00;
     }
 
@@ -1017,14 +1019,21 @@
         description: "Optimize S-Corp owner salary to reduce self-employment taxes.",
         compute: (ctx) => {
           if (ctx.taxTreatment !== "s_corp") return { eligible: false, savingsRange: range(0,0), details: "Requires S-Corp tax treatment.", tags: ["S-Corp", "Payroll"] };
-          const savings = (ctx.netIncome - ctx.ownerW2) * 0.153 * 0.5;
+          // Distributions avoid FICA. Apply 15.3% up to SS wage base, 2.9% above.
+          const distributions = Math.max(0, ctx.netIncome - ctx.ownerW2);
+          const ssBase = STRATEGY_ASSUMPTIONS.ssWageBase;
+          // Owner W-2 already uses some of the SS wage base
+          const ssRoomLeft = Math.max(0, ssBase - ctx.ownerW2);
+          const distribSubjectToSS = Math.min(distributions, ssRoomLeft);
+          const distribAboveSS = Math.max(0, distributions - ssRoomLeft);
+          const savings = distribSubjectToSS * 0.153 + distribAboveSS * 0.029;
           const savingsRange = range(savings * 0.9, savings * 1.1);
           const w2Pct = ctx.netIncome > 0 ? ctx.ownerW2 / ctx.netIncome : 0;
           const warning = w2Pct < 0.40 ? "\n\u26a0\ufe0f Your W-2 may be below reasonable compensation threshold \u2014 consult your CPA." : "";
           return {
             eligible: ctx.netIncome > 0 && ctx.ownerW2 > 0,
             savingsRange,
-            details: `(Net profit ${money(ctx.netIncome)} \u2212 Owner W-2 ${money(ctx.ownerW2)}) \u00d7 15.3% \u00d7 50% at ${pct(ctx.assumedMarginalRate)}.${warning}`,
+            details: `Distributions of ${money(distributions)} avoid FICA: ${money(distribSubjectToSS)} \u00d7 15.3% + ${money(distribAboveSS)} \u00d7 2.9% (SS wage base: ${money(ssBase)}).${warning}`,
             tags: ["S-Corp", "Payroll"],
           };
         },
@@ -1050,7 +1059,7 @@
         description: "Reimburse personal expenses (home office, phone/internet, mileage) through your business (IRC \u00a762(a)(2)(A)).",
         compute: (ctx) => {
           const miles = Math.max(0, ctx.annualMiles || 0);
-          const mileageDed = miles * 0.70;
+          const mileageDed = miles * STRATEGY_ASSUMPTIONS.mileageRate;
 
           const phoneMonthly = Math.max(0, ctx.phoneInternetMonthly || 0);
           const bizPct = clamp01((ctx.bizPhoneInternetPct || 80) / 100);
@@ -1140,10 +1149,12 @@
           const passThrough = PASS_THROUGH_ENTITIES.has(ctx.taxTreatment);
           if (!passThrough) return { eligible:false, savingsRange: range(0,0), details:"Primarily applies to pass-through entities.", tags:["199A"] };
 
-          const taxableIncome = Math.max(0, ctx.netIncome - ctx.retirementContrib - ctx.healthPremiums);
           const stdDed = STANDARD_DEDUCTION[ctx.filingStatus] ?? STANDARD_DEDUCTION.mfj;
+          // Taxable income for QBI threshold: net income minus above-the-line deductions minus standard deduction
+          const taxableIncome = Math.max(0, ctx.netIncome - ctx.retirementContrib - ctx.healthPremiums - stdDed);
 
-          const threshold = (ctx.filingStatus === "mfj") ? 383900 : 191950;
+          // 2025 thresholds (indexed for inflation)
+          const threshold = (ctx.filingStatus === "mfj") ? 394600 : 197300;
           const phaseRange = (ctx.filingStatus === "mfj") ? 100000 : 50000;
           const isSSTB = (ctx.sstb === "yes");
 
@@ -1152,6 +1163,8 @@
 
           if (taxableIncome > threshold) {
             const w2 = Math.max(0, ctx.w2Wages || 0);
+            // Greater of: 50% of W-2 wages OR 25% of W-2 wages + 2.5% of qualified property basis
+            // (qualified property basis not collected — use W-2-only test as conservative floor)
             const limit = 0.50 * w2;
             qbiDed = Math.min(qbiDed, limit);
           }
@@ -1166,10 +1179,14 @@
           const dedHigh = qbiDed * 1.10;
           const savingsRange = rangeFromDeduction(dedLow, dedHigh, ctx.assumedMarginalRate);
 
+          const altTestNote = taxableIncome > threshold
+            ? " Note: an alternative test (25% W-2 + 2.5% of qualified property basis) may yield a higher limit for capital-intensive businesses."
+            : "";
+
           return {
             eligible: ctx.netIncome > 0,
             savingsRange,
-            details: `Modeled QBI deduction using net income, taxable income (net \u2212 retirement \u2212 health), W-2 wages limit (if above threshold), and SSTB phaseout (if applicable). Standard deduction placeholder: ${money(stdDed)}.`,
+            details: `Modeled QBI deduction: taxable income ${money(taxableIncome)} (net \u2212 retirement \u2212 health \u2212 std deduction ${money(stdDed)}), threshold ${money(threshold)}.${altTestNote}`,
             tags: ["199A", "Pass-through"],
           };
         },
@@ -1229,12 +1246,12 @@
         description: "Immediate expensing of qualifying business property purchases.",
         compute: (ctx) => {
           if (ctx.purchasedEquipment !== "yes" || ctx.equipmentPlacedInService !== "yes") return { eligible: false, savingsRange: range(0,0), details: "Requires qualifying equipment purchased and placed in service this year.", tags: ["Depreciation", "Capital"] };
-          const qualifying = Math.min(ctx.equipmentCost, 1250000);
+          const qualifying = Math.min(ctx.equipmentCost, 2500000);  // 2025 §179 limit per OBBBA
           const savingsRange = rangeFromDeduction(qualifying * 0.9, qualifying * 1.1, ctx.assumedMarginalRate);
           return {
             eligible: qualifying > 0,
             savingsRange,
-            details: `Qualifying purchases: ${money(qualifying)} \u00d7 ${pct(ctx.assumedMarginalRate)}. Note: 100% bonus depreciation available for property placed in service after Jan 19, 2025.`,
+            details: `Qualifying purchases: ${money(qualifying)} \u00d7 ${pct(ctx.assumedMarginalRate)}. \u00a7179 limit: $2.5M (OBBBA); 100% bonus depreciation for property placed in service after Jan 19, 2025.`,
             tags: ["Depreciation", "Capital"],
           };
         },
@@ -1780,13 +1797,34 @@
         unrealizedLossAmount: num(els.unrealizedLossAmount ? els.unrealizedLossAmount.value : 0),
       };
 
-      ctx.assumedMarginalRate = clamp01(
-        ctx.netIncome > 500000 ? 0.37 :
-        ctx.netIncome > 250000 ? 0.32 :
-        ctx.netIncome > 150000 ? 0.24 :
-        ctx.netIncome > 80000  ? 0.22 :
-        0.12
-      );
+      // Estimate marginal rate using 2025 brackets, accounting for filing status
+      // Approximate taxable income: net income minus standard deduction and known deductions
+      const _stdDed = STANDARD_DEDUCTION[ctx.filingStatus] ?? STANDARD_DEDUCTION.mfj;
+      const _approxTaxable = Math.max(0, ctx.netIncome - ctx.retirementContrib - ctx.healthPremiums - _stdDed);
+
+      if (ctx.filingStatus === "mfj" || ctx.filingStatus === "mfs") {
+        // 2025 MFJ brackets (MFS is half these, but similar shape)
+        ctx.assumedMarginalRate = clamp01(
+          _approxTaxable > 751600 ? 0.37 :
+          _approxTaxable > 487450 ? 0.35 :
+          _approxTaxable > 383900 ? 0.32 :
+          _approxTaxable > 201050 ? 0.24 :
+          _approxTaxable > 94300  ? 0.22 :
+          _approxTaxable > 23200  ? 0.12 :
+          0.10
+        );
+      } else {
+        // 2025 Single / HoH brackets (using single thresholds)
+        ctx.assumedMarginalRate = clamp01(
+          _approxTaxable > 626350 ? 0.37 :
+          _approxTaxable > 250525 ? 0.35 :
+          _approxTaxable > 191950 ? 0.32 :
+          _approxTaxable > 100525 ? 0.24 :
+          _approxTaxable > 47150  ? 0.22 :
+          _approxTaxable > 11600  ? 0.12 :
+          0.10
+        );
+      }
 
       return ctx;
     }
