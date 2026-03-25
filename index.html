@@ -335,7 +335,7 @@
     <div class="hero">
       <h2>Estimate potential tax savings with your strategies</h2>
       <p>
-        This assessment provides a conservative preview of potential tax-saving opportunities. Our advisory review goes deeper — and is backed by a <strong>$12,000 minimum savings identification guarantee</strong>.
+        This assessment provides a conservative preview of potential tax-saving opportunities. Results are illustrative only and subject to advisor review. See our <a href="#disclaimers" style="color:var(--accent);text-decoration:underline;">Terms &amp; Disclaimers</a> below.
       </p>
     </div>
 
@@ -621,7 +621,7 @@
           <div class="accountShell"><div class="accountCard">
             <div class="progressTop"><div class="progressLabel qLabel">Question 13 of 15</div><div class="progressPct qPct">0% Complete</div></div>
             <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
-            <h2 class="questionTitle">I'm confident my accountant is maximizing all possible deductions for my business and keeping me compliant with changing tax codes.</h2>
+            <h2 class="questionTitle">Are you confident your accountant is maximizing all possible deductions for your business and keeping you compliant with changing tax codes?</h2>
             <div class="choiceGroup" id="q12">
               <button class="choice" data-value="yes" type="button">Yes</button>
               <button class="choice" data-value="no" type="button">No</button>
@@ -649,7 +649,7 @@
           <div class="accountShell"><div class="accountCard">
             <div class="progressTop"><div class="progressLabel qLabel">Question 15 of 15</div><div class="progressPct qPct">0% Complete</div></div>
             <div class="progressBar"><span class="qBar" style="width:0%"></span></div>
-            <h2 class="questionTitle">Do you own a home?</h2>
+            <h2 class="questionTitle">Do you own the home where you live?</h2>
             <div class="choiceGroup" id="q15">
               <button class="choice" data-value="yes" type="button">Yes</button>
               <button class="choice" data-value="no" type="button">No</button>
@@ -659,7 +659,7 @@
             <!-- Sq ft modal (opens only if they select Yes) -->
             <div class="modalOverlay" id="homeSqftModal" role="dialog" aria-modal="true" aria-labelledby="homeSqftTitle">
               <div class="modalCard">
-                <h3 id="homeSqftTitle">What is the approximate square footage of your home?</h3>
+                <h3 id="homeSqftTitle">What is the approximate total square footage of your home?</h3>
                 <p>We estimate Augusta Rule rent at <strong>$0.75 per sq ft per day</strong> for <strong>14 days</strong>.</p>
                 <div>
                   <label for="homeSqftInput">Home square footage</label>
@@ -783,7 +783,7 @@
             </div>
 
             <div>
-              <label for="hasKids">Do you have children you could pay for legitimate work?</label>
+              <label for="hasKids">Do you have children (under 18) who could perform legitimate work for your business?</label>
               <select id="hasKids">
                 <option value="unknown">I'm not sure</option>
                 <option value="no">No</option>
@@ -896,7 +896,7 @@
             <h2>Thank You!</h2>
             <p>Your information has been submitted successfully. A member of the Ark Academy team will be reaching out shortly to review your results and discuss your personalized tax strategy.</p>
             <div class="thankYouGuarantee">
-              <strong>Our Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
+              <strong>Important Disclaimer:</strong> These results are illustrative estimates based on general assumptions and the information you provided. They do not constitute tax advice. Actual savings depend on your specific circumstances and require review by a qualified tax professional. Ark Academy offers a satisfaction guarantee on advisory engagements — details provided during consultation.
             </div>
           </div>
         </div>
@@ -907,6 +907,22 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="disclaimers" style="max-width:var(--max); margin:32px auto 0; padding:24px 16px; border-top:2px solid var(--line);">
+    <h3 style="font-size:14px; color:var(--muted); margin:0 0 12px; font-weight:700;">Terms &amp; Disclaimers</h3>
+    <p style="font-size:12px; color:var(--muted); line-height:1.6; margin:0 0 10px;">
+      <strong>Not Tax Advice:</strong> This tool provides illustrative estimates for educational and informational purposes only. It does not constitute tax, legal, or financial advice. The strategies and savings ranges shown are based on general assumptions and the limited information provided. Actual eligibility, applicability, and savings amounts will vary based on your complete financial picture and require review by a qualified tax professional.
+    </p>
+    <p style="font-size:12px; color:var(--muted); line-height:1.6; margin:0 0 10px;">
+      <strong>No Guarantee of Savings:</strong> Ark Academy does not guarantee any specific tax savings from this assessment. Any satisfaction guarantee applies only to paid advisory engagements and is subject to the terms of your engagement agreement.
+    </p>
+    <p style="font-size:12px; color:var(--muted); line-height:1.6; margin:0 0 10px;">
+      <strong>Privacy:</strong> Information you provide is transmitted securely via HTTPS and used solely for generating your tax strategy preview and for Ark Academy to contact you regarding advisory services. We do not sell your personal information to third parties. For full details, contact us at <a href="mailto:academy@arkfinancial.com" style="color:var(--accent);">academy@arkfinancial.com</a>.
+    </p>
+    <p style="font-size:12px; color:var(--muted); line-height:1.6; margin:0;">
+      <strong>Terms of Use:</strong> By using this tool, you acknowledge that the results are preliminary estimates and agree to our terms of service. You must be 18 years or older to use this tool. Ark Academy reserves the right to modify or discontinue this tool at any time.
+    </p>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -1431,7 +1447,7 @@
     const STEP_RESULTS = 20;
 
     const DEFAULTS = {
-      state: "TX",
+      state: "",
       entityType: "sole_prop",
       industry: "",
       firstName: "",
@@ -1439,13 +1455,13 @@
       businessName: "",
       mobilePhone: "",
       email: "",
-      homeSqft: 2400,
-      revenue: 500000,
-      netIncome: 220000,
-      w2Wages: 120000,
-      ownerW2: 80000,
-      retirementContrib: 30000,
-      healthPremiums: 12000,
+      homeSqft: 0,
+      revenue: 0,
+      netIncome: 0,
+      w2Wages: 0,
+      ownerW2: 0,
+      retirementContrib: 0,
+      healthPremiums: 0,
       notes: "",
       filingStatus: "mfj",
       mortgageInterest: 0,
@@ -1484,7 +1500,7 @@
       const states = [
         ["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["FL","Florida"],["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],["KS","Kansas"],["KY","Kentucky"],["LA","Louisiana"],["ME","Maine"],["MD","Maryland"],["MA","Massachusetts"],["MI","Michigan"],["MN","Minnesota"],["MS","Mississippi"],["MO","Missouri"],["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","New Hampshire"],["NJ","New Jersey"],["NM","New Mexico"],["NY","New York"],["NC","North Carolina"],["ND","North Dakota"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregon"],["PA","Pennsylvania"],["RI","Rhode Island"],["SC","South Carolina"],["SD","South Dakota"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VA","Virginia"],["WA","Washington"],["WV","West Virginia"],["WI","Wisconsin"],["WY","Wyoming"],
       ];
-      els.state.innerHTML = states.map(([abbr,name]) => `<option value="${abbr}">${name}</option>`).join("");
+      els.state.innerHTML = '<option value="">— Select your state —</option>' + states.map(([abbr,name]) => `<option value="${abbr}">${name}</option>`).join("");
     }
 
     function syncChoiceSelection(buttons, value){
@@ -1622,6 +1638,7 @@
 
       renderStepper();
       tick();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function num(v){
@@ -1784,11 +1801,18 @@
         if (!ctx.email || !ctx.email.includes("@")) issues.push("A valid email is required.");
       }
       if (stepIdx >= 1 && !ctx.state) issues.push("Please select a state.");
+      if (stepIdx >= STEP_FINANCIALS) {
+        if (ctx.revenue <= 0) issues.push("Annual revenue must be greater than zero.");
+        if (ctx.netIncome > ctx.revenue) issues.push("Net profit cannot exceed revenue.");
+        if (ctx.ownerW2 > ctx.netIncome && ctx.netIncome > 0) issues.push("Owner W-2 should not exceed net profit.");
+      }
       return issues;
     }
 
     function computeResults(ctx){
       const results = [];
+      // Guard: if revenue is zero or net income is zero/negative, no strategies apply
+      if (ctx.revenue <= 0 || ctx.netIncome <= 0) return results;
       for (const rule of STRATEGY_RULES){
         const out = rule.compute(ctx);
         if (!out || !out.eligible) continue;
@@ -1956,7 +1980,7 @@
         <div class="rpFoot">
           <strong>Important:</strong> This report is a conservative preview for planning and marketing intake. Actual eligibility and savings require a full advisor review and proper documentation.
           <br/><br/>
-          <strong>Guarantee:</strong> If, after completing a full Ark strategy review, we cannot identify at least <strong>$12,000</strong> in legally available tax-saving opportunities, we will refund your fee.
+          <strong>Disclaimer:</strong> These results are illustrative estimates only and do not constitute tax, legal, or financial advice. Actual savings require review by a qualified advisor.
         </div>`;
 
       return `<!doctype html>
@@ -2064,7 +2088,7 @@
       lines.push("");
       lines.push("This is a conservative estimate. Schedule a free strategy call to see the full picture.");
       lines.push("");
-      lines.push("Our Guarantee: If, after completing a full Ark strategy review, we cannot identify at least $12,000 in legally available tax-saving opportunities, we will refund your fee.");
+      lines.push("Disclaimer: These results are illustrative estimates only and do not constitute tax, legal, or financial advice. Actual savings require review by a qualified advisor.");
       return lines.join("\n");
     }
 
